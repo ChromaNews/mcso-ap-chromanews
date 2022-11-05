@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "645862974424",
+    "project_id": "chroma-news-71bbe",
+    "storage_bucket": "chroma-news-71bbe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645862974424:android:03fb603b94d2a8eb9748ad",
+        "android_client_info": {
+          "package_name": "com.mcso.ap.chromanews"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645862974424-87etaqvhb67noj11vti8abq6suaq3gl6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mcso.ap.chromanews",
+            "certificate_hash": "a705fe292fd0361db495e7c13ee711ec88980b11"
+          }
+        },
+        {
+          "client_id": "645862974424-gen197b60hdpd96fu0h25fcs5kt1s0qm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4zqhecrzmBAmtN57LWTG3yiWnKFqe8G4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645862974424-gen197b60hdpd96fu0h25fcs5kt1s0qm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
