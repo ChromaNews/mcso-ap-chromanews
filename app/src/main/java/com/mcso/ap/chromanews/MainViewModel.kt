@@ -25,11 +25,6 @@ class MainViewModel(): ViewModel() {
     // live data
     private val newsDataList = MutableLiveData<NewsDataApi.NewsDataResponse>()
 
-
-    init {
-        netNewsData()
-    }
-
     // update firebase user
     fun updateUser(){
         firebaseAuthLiveData.updateUser()
