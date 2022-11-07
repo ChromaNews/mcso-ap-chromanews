@@ -30,5 +30,8 @@ class MainActivity : AppCompatActivity() {
 
         // Start firebase signIn
         AuthInit(viewModel,signInLauncher)
+
+        // test newsdata
+        viewModel.netNewsData()
     }
 }
