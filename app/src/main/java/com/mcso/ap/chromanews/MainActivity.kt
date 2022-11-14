@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import com.mcso.ap.chromanews.db.SentimentDBHelper
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,5 +34,8 @@ class MainActivity : AppCompatActivity() {
 
         // test newsdata
         viewModel.netNewsData()
+
+        // test firestore
+        viewModel.updateUserSentiment()
     }
 }
