@@ -25,7 +25,7 @@ class AuthInit(viewModel: MainViewModel, signInLauncher: ActivityResultLauncher<
             signInLauncher.launch(signInIntent)
         } else {
             Log.d(TAG, "User: ${user.displayName}")
-            viewModel.updateUser()
+            // viewModel.updateUser()
         }
     }
 

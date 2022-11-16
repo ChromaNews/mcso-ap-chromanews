@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:clickable="true"
+    android:layout_margin="8dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        tools:context=".PostFragment">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:textSize="16sp"
+            android:typeface="serif"
+            android:textStyle="bold"
+            android:text="title"
+            app:layout_constraintBottom_toTopOf="@id/imageTextUnion"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <!--Kind of a weird construction. The FrameLayout acts like -->
+        <!-- a "union" that can contain either an ImageView or TextView-->
+
+        <FrameLayout
+            android:id="@+id/imageTextUnion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/statsLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="114dp"
+                    android:layout_height="104dp"
+                    android:layout_gravity="end"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_toEndOf="@+id/Category"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitEnd" />
+
+                <TextView
+                    android:id="@+id/Category"
+                    android:layout_width="275dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:padding="10dp"
+                    android:text="category"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/selfText"
+                    android:layout_width="275dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:padding="10dp"
+                    android:text="Description"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="130dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:autoLink="web"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="Link"
+                    android:linksClickable="true"
+                    android:padding="10dp"
+                    android:textSize="12sp" />
+
+                <!--
+                <TextView
+                    android:id="@+id/author"
+                    android:layout_width="275dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="130dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:padding="10dp"
+                    android:text="Author"
+                    android:textSize="12sp" />
+                -->
+            </RelativeLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/statsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageTextUnion">
+
+            <TextView
+                android:id="@+id/PubdateVal"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_margin="12dp"
+                android:layout_weight="3"
+                android:text="Publish Date"
+                android:gravity="left" />
+
+            <ImageView
+                android:id="@+id/share"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_margin="12dp"
+                android:layout_weight="1"
+                android:src="@drawable/baseline_share_24" />
+
+
+            <ImageView
+                android:id="@+id/bookmarkFav"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_margin="12dp"
+                android:layout_weight="1"
+                android:src="@drawable/baseline_bookmark_border_24" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
