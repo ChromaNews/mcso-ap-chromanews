@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,8 +28,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
 
-        // Start firebase signIn
+        // Toolbar
+        setSupportActionBar(activityMainBinding.mainToolbar)
+
+        // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
         // test newsdata
