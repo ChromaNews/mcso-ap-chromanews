@@ -1,12 +1,11 @@
 package com.mcso.ap.chromanews
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.mcso.ap.chromanews.db.SentimentDBHelper
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,9 +32,14 @@ class MainActivity : AppCompatActivity() {
         AuthInit(viewModel,signInLauncher)
 
         // test newsdata
-        viewModel.netNewsData()
+        //viewModel.netNewsData()
 
         // test firestore
         viewModel.updateUserSentiment()
+        viewModel.calculateRating()
+
+        viewModel.observeRatingByDate().observe(this){
+            viewModel.calculateSentimentColorCode(it)
+        }
     }
 }

@@ -1,15 +1,13 @@
 package com.mcso.ap.chromanews.db
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.mcso.ap.chromanews.model.sentiment.RatingDate
 import com.mcso.ap.chromanews.model.sentiment.UserSentimentData
 import okhttp3.internal.toImmutableList
-import java.text.DateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -19,6 +17,8 @@ class SentimentDBHelper {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val rootCollection = "userSentiments"
     private val dateCollection = "dateList"
+
+    private val ratingDateList = MutableLiveData<List<Double>>()
 
     private fun createSentimentUser(email: String){
         db.collection(rootCollection).document(email)
@@ -94,5 +94,40 @@ class SentimentDBHelper {
                     }
             }
         }
+    }
+
+    fun getTotalRating(email: String, ratingDateList: MutableLiveData<List<Double>>) {
+        val ratingByDate = mutableListOf<Double>()
+        val dateCollection = db.collection(rootCollection)
+            .document(email).collection(dateCollection)
+
+        dateCollection.get()
+            .addOnSuccessListener {
+
+                Log.d(TAG, "result: ${it.documents.size}")
+                it.documents.forEach { doc ->
+                    run {
+                        var totalRate: Double = 0.0
+                        if (doc.exists()) {
+                            Log.d(TAG, "adding rates on ${doc.id}")
+                            val ratingDate = doc.toObject(RatingDate::class.java)
+                            Log.d(TAG, "date: ${ratingDate?.date}")
+                            ratingDate?.rateList?.forEach{
+                                rate ->
+                                run {
+                                    Log.d(TAG, "rate: $rate")
+                                    totalRate += rate
+                                }
+                            }
+                            totalRate /= ratingDate?.rateList?.size!!
+                            ratingByDate.add(totalRate)
+                        }
+
+                    }
+                }
+                Log.d(TAG, "total rate: ${ratingByDate[0]}")
+                ratingDateList.postValue(ratingByDate)
+            }
+
     }
 }
