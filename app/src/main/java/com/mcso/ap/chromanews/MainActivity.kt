@@ -1,42 +1,63 @@
 package com.mcso.ap.chromanews
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = "MainActivity"
+    private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var recyclerView: RecyclerView
+
+    companion object {
+        private val TAG = "MainActivity"
+        private const val mainFragTag = "mainFragTag"
+    }
 
     // call back once log signInIntent is completed in AuthInit()
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        result ->
+            result ->
         run {
             if (result.resultCode == Activity.RESULT_OK) {
-                viewModel.updateUser()
+                // viewModel.updateUser()
             } else {
-                Log.e(TAG, "User login failed")
+                Log.e(MainActivity.TAG, "User login failed")
             }
         }
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
 
-        // Toolbar
-        setSupportActionBar(activityMainBinding.mainToolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
-        // test newsdata
-        viewModel.netNewsData()
+        val navView: BottomNavigationView = binding.navView
+        val navController = findNavController(R.id.recyclerView)
+
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.navigation_categories, R.id.navigation_newsfeed, R.id.navigation_bookmark
+            )
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
     }
 }

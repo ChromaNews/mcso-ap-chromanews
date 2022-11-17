@@ -1,5 +1,10 @@
 package com.mcso.ap.chromanews.api
 
+import android.text.SpannableString
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import com.mcso.ap.chromanews.model.api.NewsData
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -8,15 +13,38 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.lang.reflect.Type
 
 interface NewsDataApi {
     // https://newsdata.io/api/1/news?apikey=YOUR_API_KEY&language=en&category=entertainment
     @GET("api/1/news?language=en&apiKey=pub_13176ea88c295f0b89581072689b85a83fd3d")
     suspend fun getNews(@Query("category") category: String) : NewsDataResponse
 
-    data class NewsDataResponse(val newsResults: List<NewsData>)
+    data class NewsDataResponse(
+        val status: String?,
+        val totalResults: Int?,
+        val results: List<NewsPost>,
+        val nextPage: Int?
+    )
+
+   data class NewsChildrenResponse(
+        val data: List<NewsPost>
+        )
+
+
+    class SpannableDeserializer : JsonDeserializer<SpannableString> {
+        // @Throws(JsonParseException::class)
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): SpannableString {
+            return SpannableString(json.asString)
+        }
+    }
 
     companion object {
+
         private const val hostUrl = "newsdata.io"
         var url = HttpUrl.Builder().scheme("https")
             .host(hostUrl)
