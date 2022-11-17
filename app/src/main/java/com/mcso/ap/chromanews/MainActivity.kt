@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Start firebase signIn
+        // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
         val navView: BottomNavigationView = binding.navView

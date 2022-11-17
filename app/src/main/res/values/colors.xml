@@ -3,5 +3,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <!-- App custom colors -->
+    <color name="cn_primary">#2196F3</color>
+    <color name="cn_primary_dark">#0069C0</color>
 </resources>
             
