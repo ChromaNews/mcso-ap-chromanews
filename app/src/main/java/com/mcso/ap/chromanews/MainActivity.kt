@@ -5,21 +5,17 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.mcso.ap.chromanews.api.Repository
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private var dataList = Repository.fetchData()
-    private lateinit var  adapter: CategoryAdapter
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
@@ -51,20 +47,9 @@ class MainActivity : AppCompatActivity() {
         // Start firebase signIn
         AuthInit(viewModel,signInLauncher)
 
-        // added data from arraylist to adapter class.
-        // recyclerView = binding.recyclerView
-        // recyclerView.layoutManager = GridLayoutManager(applicationContext, 2)
-        // adapter = CategoryAdapter(viewModel)
-        // recyclerView.adapter = adapter
-
-        // adapter.setDataList(dataList)
-
-        // test newsdata
-        // viewModel.netNewsData()
-
         val navView: BottomNavigationView = binding.navView
-
         val navController = findNavController(R.id.recyclerView)
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
@@ -74,7 +59,5 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        // Navigation sets the title to "Simple"
-        supportActionBar?.title = "Categories"
     }
 }
