@@ -20,14 +20,6 @@ interface NewsDataApi {
     @GET("api/1/news?language=en&apiKey=pub_13176ea88c295f0b89581072689b85a83fd3d")
     suspend fun getNews(@Query("category") category: String) : NewsDataResponse
 
-    // @GET("api/1/news?language=en&apiKey=pub_13176ea88c295f0b89581072689b85a83fd3d&q=categories")
-    // suspend fun getCategories(): NewsDataResponse
-
-    // data class NewsDataResponse(val newsResults: List<NewsData>)
-
-   //  class NewsDataResponse(val data: ListingData)
-
-    // class ListingData
     data class NewsDataResponse(
         val status: String?,
         val totalResults: Int?,
@@ -40,9 +32,6 @@ interface NewsDataApi {
         )
 
 
-    // This class allows Retrofit to parse items in our model of type
-    // SpannableString.  Note, given the amount of "work" we do to
-    // enable this behavior, one can argue that Retrofit is a bit...."simple."
     class SpannableDeserializer : JsonDeserializer<SpannableString> {
         // @Throws(JsonParseException::class)
         override fun deserialize(
@@ -55,15 +44,6 @@ interface NewsDataApi {
     }
 
     companion object {
-
-        /*
-        private fun buildGsonConverterFactory(): GsonConverterFactory {
-            val gsonBuilder = GsonBuilder().registerTypeAdapter(
-                SpannableString::class.java, SpannableDeserializer()
-            )
-            return GsonConverterFactory.create(gsonBuilder.create())
-        }
-         */
 
         private const val hostUrl = "newsdata.io"
         var url = HttpUrl.Builder().scheme("https")
