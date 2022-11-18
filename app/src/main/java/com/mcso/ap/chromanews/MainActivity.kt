@@ -48,12 +48,11 @@ class MainActivity : AppCompatActivity() {
         AuthInit(viewModel,signInLauncher)
 
         // test firestore
-        /*viewModel.updateUserSentiment()
         viewModel.calculateRating()
 
         viewModel.observeRatingByDate().observe(this){
             viewModel.calculateSentimentColorCode(it)
-        }*/
+        }
 
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.recyclerView)
