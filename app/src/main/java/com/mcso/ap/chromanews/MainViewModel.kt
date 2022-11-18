@@ -2,10 +2,9 @@ package com.mcso.ap.chromanews
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.mcso.ap.chromanews.api.NewsDataApi
-import com.mcso.ap.chromanews.api.NewsDataRepo
-import com.mcso.ap.chromanews.api.NewsPost
+import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
+import com.mcso.ap.chromanews.model.api.SentimentData
 import com.mcso.ap.chromanews.model.auth.FirebaseUserLiveData
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +22,11 @@ class MainViewModel(): ViewModel() {
     // NewsData repo and api
     private val newsDataApi = NewsDataApi.create()
     private val newsDataRepo = NewsDataRepo(newsDataApi)
+
+    // Sentiment Analyzer api / response
+    private val sentimentAnalyzerApi = SentimentAnalyzerApi.create()
+    private val sentimentAnalyzerRepo = SentimentAnalyzerRepo(sentimentAnalyzerApi)
+    private val sentimentResponse = MutableLiveData<SentimentData>()
 
     // Sentiment data DB
     private val sentimentDataDB: SentimentDBHelper = SentimentDBHelper()
@@ -76,21 +80,6 @@ class MainViewModel(): ViewModel() {
             Log.d(TAG, fetchList.value.toString())
             fetchList.postValue(newsDataRepo.getNews(category.value.toString()))
         }
-    }
-
-    fun updateUserSentiment(){
-        // TODO - random number for rating. Replace with rating from sentiment API
-        val rating: Double = String.format(
-            "%.6f", Random.nextDouble(0.1,0.99)
-        ).toDouble()
-        firebaseAuthLiveData.getUser()?.let { sentimentDataDB.createSentimentRating(it, rating) }
-    }
-
-    fun calculateRating(){
-        firebaseAuthLiveData.getUser()?.let {
-            sentimentDataDB.getTotalRating(it, ratingDateList)
-        }!!
-
     }
 
     fun observeCategory(): LiveData<String> {
@@ -152,7 +141,29 @@ class MainViewModel(): ViewModel() {
         return favPostsList.value!!.size
     }
 
-    // BEGIN RATING SECTION
+
+    /**
+     * BEGIN RATING SECTION
+     */
+
+    fun netAnalyzeNews(newsText: String){
+        viewModelScope.launch (
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO)
+        {
+            val response = sentimentAnalyzerRepo.analyzeNewsText(newsText)
+            sentimentResponse.postValue(sentimentAnalyzerRepo.analyzeNewsText(newsText))
+        }
+    }
+
+    fun observeSentimentScore(): LiveData<SentimentData>{
+        return sentimentResponse
+    }
+
+    fun updateUserSentiment(score: Double){
+        firebaseAuthLiveData.getUser()?.let { sentimentDataDB.createSentimentRating(it, score) }
+    }
+
     fun observeRatingByDate(): LiveData<List<Double>> {
         return ratingDateList
     }
@@ -187,5 +198,12 @@ class MainViewModel(): ViewModel() {
         val blue = (abs(sentimentNum) * 255).toInt()
         val green = abs((1 - sentimentNum) * 255).toInt()
         sentimentColor = SentimentColor(0, green, blue)
+    }
+
+
+    fun calculateRating(){
+        firebaseAuthLiveData.getUser()?.let {
+            sentimentDataDB.getTotalRating(it, ratingDateList)
+        }!!
     }
 }
