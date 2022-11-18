@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_categories">
+
+    <fragment
+        android:id="@+id/navigation_categories"
+        android:name="com.mcso.ap.chromanews.CategoryFragment"
+        android:label="Categories"
+        tools:layout="@layout/fragment_rv"/>
+
+    <fragment
+        android:id="@+id/navigation_newsfeed"
+        android:name="com.mcso.ap.chromanews.NewsFeedFragment"
+        android:label="Newsfeed"
+        tools:layout="@layout/fragment_rv" />
+
+    <fragment
+        android:id="@+id/navigation_bookmark"
+        android:name="com.mcso.ap.chromanews.BookmarkFragment"
+        android:label="Bookmark"
+        tools:layout="@layout/fragment_rv" />
+</navigation>
