@@ -28,29 +28,23 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         val TAG = "NewsFeedAdapter"
     }
 
-    // ViewHolder pattern holds row binding
     inner class VH(val rowPostBinding : RowPostBinding)
         : RecyclerView.ViewHolder(rowPostBinding.root) {
         init {
-            //XXX Write me.
 
             rowPostBinding.root.setOnClickListener {
                 Log.d("ANBU", "ItemSelected ")
-
                 var item = getItem(adapterPosition)
 
                 Log.d("ANBU: Item", item.toString())
-
-                // MainViewModel.doOnePost(rowPostBinding.root.context, item)
+                MainViewModel.doOnePost(rowPostBinding.root.context, item)
             }
 
             rowPostBinding.share.setOnClickListener {
                 Log.d("ANBU: ", "clicking share button")
-
-                val local = viewModel.getItemAt(position)
+                val local = viewModel.getItemAt(adapterPosition)
 
                 val sharebody: String = local!!.title
-
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_TEXT, getItem(adapterPosition).link)
@@ -73,21 +67,8 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
                     viewModel.addFav(getItem(position))
                     // notifyDataSetChanged()
                 }
-                /*
-                local?.let {
-                    Log.d("ANBU: favorite-2", viewModel.isFav(it).toString())
-                    if (viewModel.isFav(getItem(it)) {
-                        viewModel.removeFav(getItem(it))
-                        //rowPostBinding.rowFav.setImageResource(R.drawable.ic_favorite_border_black_24dp)
-                    } else {
-                        viewModel.addFav(it)
-                    }
-                  notifyItemChanged(position)
-                 */
-                // viewModel.repoFetch()
                 notifyDataSetChanged()
                 // notifyItemChanged(position)
-
                 }
             }
     }
@@ -102,6 +83,8 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
+
+        val category_list = viewModel.getCategories().value
 
         val binding = holder.rowPostBinding
 
@@ -120,8 +103,17 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         binding.title.setTextColor(Color.BLACK)
         binding.PubdateVal.setTextColor(Color.BLACK)
         binding.selfText.setTextColor(Color.BLACK)
-        val separator = ","
-        binding.Category.text = item.category.joinToString(separator)
+
+        Log.d("ANBU: selected item", item.category.toString())
+        Log.d("ANBU: category_list ", category_list.toString())
+        val catList = mutableListOf<String>()
+        for (i in item.category) {
+            if (category_list?.contains(i) == true){
+                catList.add(i)
+            }
+        }
+        Log.d("ANBU: catList", catList.toString())
+        binding.Category.text = catList.joinToString(",")
         binding.Category.setTextColor(Color.GREEN)
 
         // binding.author.text = item.creator.toString()

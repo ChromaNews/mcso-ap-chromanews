@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private val TAG = "MainActivity"
         private const val mainFragTag = "mainFragTag"
+        // private val category = "entertainment"
     }
 
     // call back once log signInIntent is completed in AuthInit()
@@ -44,11 +45,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // setSupportActionBar(binding.toolbarMain)
+
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
         val navView: BottomNavigationView = binding.navView
-        val navController = findNavController(R.id.recyclerView)
+        val navController = findNavController(R.id.NavHostFragment)
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

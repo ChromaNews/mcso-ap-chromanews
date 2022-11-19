@@ -42,7 +42,7 @@ class CategoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //SSS
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Categories"
+        // (requireActivity() as AppCompatActivity).supportActionBar?.title = "Categories"
         binding.recyclerRVView.layoutManager = GridLayoutManager(binding.recyclerRVView.context,
         2)
         adapter = CategoryAdapter(viewModel)

@@ -6,10 +6,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.util.SparseBooleanArray
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.mcso.ap.chromanews.api.RecyclerData
 import com.mcso.ap.chromanews.databinding.RowLayoutBinding
+import java.util.*
 
 // import kotlinx.android.synthetic.main.photo_layout.view.*
 
@@ -19,6 +22,8 @@ class CategoryAdapter(private val viewModel: MainViewModel)
 
     lateinit var imgid: ImageView
     lateinit var title: TextView
+    private val selectedItems = SparseBooleanArray()
+    private val selectedCategory = mutableListOf<String>()
 
     var dataList = emptyList<RecyclerData>()
 
@@ -48,7 +53,6 @@ class CategoryAdapter(private val viewModel: MainViewModel)
         //    title = itemView.findViewById(R.id.categoryText)
             title = rowBinding.categoryText.findViewById(R.id.categoryText)
         }
-
     }
 
     // Usually involves inflating a layout from XML and returning the holder
@@ -66,38 +70,49 @@ class CategoryAdapter(private val viewModel: MainViewModel)
     // override fun onBindViewHolder(holder: PhotoAdapter.ViewHolder, position: Int) {
     override fun onBindViewHolder(holder: VH, position: Int) {
         // Get the data model based on position
+        val highlightCategories = viewModel.getCategories().value
         var data = dataList[position]
 
-        // val item = viewModel.getItemAt(position)
-        // val binding = holder.rowBinding
-        // Set item views based on your views and data model
-        // if (item != null) {
-        //    binding.categoryText.text = item.title
-        //    binding.categoryImage.setImageDrawable(item.)
-        // }
+        Log.d("ANBU: highlightCategories", highlightCategories.toString())
+
         holder.rowBinding.categoryText.text = data.title
-        // holder.title.text = data.title
-        // holder.imgid.setImageResource(data.imgid)
         holder.rowBinding.categoryImage.setImageResource(data.imgid)
 
+        if (highlightCategories != null) {
+            for (category in highlightCategories){
+                if (category == data.title.lowercase(Locale.ROOT)){
+                    holder.itemView.isSelected = true
+                    selectedItems.put(position, true)
+                    val item = data.title.lowercase(Locale.ROOT)
+                    if(! selectedCategory.contains(item)){
+                        selectedCategory.add(data.title.lowercase(Locale.ROOT))
+                    }
+                    holder.itemView.setBackgroundColor(Color.RED)
+                }
+            }
+        }
+
         holder.itemView.setOnClickListener{
-            Log.d("ANBU: title clicked", data.title)
-            Log.d("ANBU: image clicked", data.imgid.toString())
+            if (selectedItems[position, false]) {
+                Log.d("ANBU:",  "Its in false condition")
+                selectedItems.delete(position)
+                it.isSelected = false
+                selectedCategory.remove(data.title.lowercase(Locale.ROOT))
+                it.setBackgroundColor(Color.WHITE)
+            }
+            else {
+                Log.d("ANBU:", "Its in true condition")
+                selectedItems.put(position, true)
+                it.isSelected = true
+                if(! selectedCategory.contains(data.title.lowercase(Locale.ROOT))){
+                    selectedCategory.add(data.title.lowercase(Locale.ROOT))
+                }
+                it.setBackgroundColor(Color.RED)
+            }
 
-            viewModel.setCategory(data.title.toString())
-            it.isSelected = true
-            it.setBackgroundColor(Color.RED)
-
-           //  val activity = it.context as AppCompatActivity
-            //val appCompatActivity = context as AppCompatActivity
-           // activity.supportFragmentManager
-           //     .beginTransaction()
-           //     .replace(R.id.main_frame, NewsFeedFragment())
-           //     .addToBackStack(null)
-           //     .commit()
-
-            // val manager: FragmentManager = (context as AppCompatActivity).supportFragmentManager
-            // val Ft: FragmentTransaction = manager.beginTransaction()
+            Log.d("ANBU: CombinedCategory", selectedCategory.toString() )
+            viewModel.setCategory(selectedCategory)
+            Log.d("ANBU: ConfiguredCategory", viewModel.getCategories().value.toString())
         }
     }
 
