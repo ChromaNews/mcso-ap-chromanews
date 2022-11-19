@@ -2,16 +2,38 @@ package com.mcso.ap.chromanews
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.mcso.ap.chromanews.api.NewsDataApi
-import com.mcso.ap.chromanews.api.NewsDataRepo
-import com.mcso.ap.chromanews.api.NewsPost
+import com.mcso.ap.chromanews.api.*
+import com.mcso.ap.chromanews.db.SentimentDBHelper
+import com.mcso.ap.chromanews.model.api.SentimentData
 import com.mcso.ap.chromanews.model.auth.FirebaseUserLiveData
+import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.random.Random
 
 class MainViewModel(): ViewModel() {
+
+    private val TAG = "MainViewModel"
+
     // Firebase
     private val firebaseAuthLiveData = FirebaseUserLiveData()
+
+    // NewsData repo and api
+    private val newsDataApi = NewsDataApi.create()
+    private val newsDataRepo = NewsDataRepo(newsDataApi)
+
+    // Sentiment Analyzer api / response
+    private val sentimentAnalyzerApi = SentimentAnalyzerApi.create()
+    private val sentimentAnalyzerRepo = SentimentAnalyzerRepo(sentimentAnalyzerApi)
+    private val sentimentResponse = MutableLiveData<SentimentData>()
+
+    // Sentiment data DB
+    private val sentimentDataDB: SentimentDBHelper = SentimentDBHelper()
+    private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
+
+    // sentiment color rating data
+    private val ratingDateList = MutableLiveData<List<Double>>()
 
     // newsdata
     private val newsDataList = MediatorLiveData<List<NewsPost>>().apply {
@@ -26,8 +48,6 @@ class MainViewModel(): ViewModel() {
         firebaseAuthLiveData.updateUser()
     }
 
-    private val newsDataApi = NewsDataApi.create()
-    private val newsDataRepo = NewsDataRepo(newsDataApi)
     private var title = MutableLiveData<String>()
     private var searchTerm: MutableLiveData<String> = MutableLiveData("")
     var fetchDone : MutableLiveData<Boolean> = MutableLiveData(false)
@@ -57,7 +77,7 @@ class MainViewModel(): ViewModel() {
             context = viewModelScope.coroutineContext
                     + Dispatchers.IO)
         {
-            Log.d("ANBU: ", fetchList.value.toString())
+            Log.d(TAG, fetchList.value.toString())
             fetchList.postValue(newsDataRepo.getNews(category.value.toString()))
         }
     }
@@ -119,5 +139,71 @@ class MainViewModel(): ViewModel() {
 
     fun getFavoriteCount() : Int {
         return favPostsList.value!!.size
+    }
+
+
+    /**
+     * BEGIN RATING SECTION
+     */
+
+    fun netAnalyzeNews(newsText: String){
+        viewModelScope.launch (
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO)
+        {
+            val response = sentimentAnalyzerRepo.analyzeNewsText(newsText)
+            sentimentResponse.postValue(sentimentAnalyzerRepo.analyzeNewsText(newsText))
+        }
+    }
+
+    fun observeSentimentScore(): LiveData<SentimentData>{
+        return sentimentResponse
+    }
+
+    fun updateUserSentiment(score: Double){
+        firebaseAuthLiveData.getUser()?.let { sentimentDataDB.createSentimentRating(it, score) }
+    }
+
+    fun observeRatingByDate(): LiveData<List<Double>> {
+        return ratingDateList
+    }
+
+    fun calculateSentimentColorCode(ratingByDate: List<Double>){
+        Log.d(TAG, "total rating: ${ratingByDate.sum() / ratingByDate.size}")
+
+        when (val sentimentValue = (ratingByDate.sum() / ratingByDate.size)){
+            0.0 -> {
+                Log.d(TAG, "Neutral Sentiment value = $sentimentValue")
+                sentimentColor = SentimentColor(0, 255, 0)
+            }
+            in 0.00..1.0 -> {
+                Log.d(TAG, "Positive Sentiment value = $sentimentValue")
+                calculatePositiveColor(sentimentValue)
+            }
+            in -1.0..-0.01 -> {
+                Log.d(TAG, "Negative Sentiment value = $sentimentValue")
+                calculateNegativeColor(sentimentValue)
+            }
+        }
+        Log.d(TAG, "mood color: [${sentimentColor.red}, ${sentimentColor.green}, ${sentimentColor.blue}]")
+    }
+
+    private fun calculateNegativeColor(sentimentNum: Double){
+        val red = (abs(sentimentNum) * 255).toInt()
+        val green = abs((1 + sentimentNum) * 255).toInt()
+        sentimentColor = SentimentColor(red, green, 0)
+    }
+
+    private fun calculatePositiveColor(sentimentNum: Double){
+        val blue = (abs(sentimentNum) * 255).toInt()
+        val green = abs((1 - sentimentNum) * 255).toInt()
+        sentimentColor = SentimentColor(0, green, blue)
+    }
+
+
+    fun calculateRating(){
+        firebaseAuthLiveData.getUser()?.let {
+            sentimentDataDB.getTotalRating(it, ratingDateList)
+        }!!
     }
 }
