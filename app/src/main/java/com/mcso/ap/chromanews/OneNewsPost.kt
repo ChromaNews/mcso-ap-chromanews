@@ -2,9 +2,15 @@ package com.mcso.ap.chromanews
 
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.onNavDestinationSelected
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mcso.ap.chromanews.databinding.ActivityOnePostBinding
 
 
@@ -16,38 +22,38 @@ class OneNewsPost : AppCompatActivity() {
         setContentView(activityOnePostBinding.root)
 
         // Get a support ActionBar corresponding to this toolbar and enable the Up button
-        setSupportActionBar(activityOnePostBinding.toolbar)
-        // supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        // setSupportActionBar(activityOnePostBinding.toolbar)
+
+        activityOnePostBinding.toolbar.title = "One Post"
+        // supportActionBar?.setDisplayShowTitleEnabled(true)
+        // supportActionBar?.setDisplayShowTitleEnabled(false)
         // supportActionBar?.setDisplayShowCustomEnabled(false)
-
-
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.setDisplayShowCustomEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         val bundle: Bundle? = intent.extras
-        // activityOnePostBinding.toolbar.title = ""
 
         var title = bundle?.getString("titleKey")
-        var ellipTitle = title
-        if (title!!.length > 30){
-            // activityOnePostBinding.toolbarTitle.maxEms = 30
-            // activityOnePostBinding.toolbarTitle.ellipsize = TextUtils.TruncateAt.END
-            // activityOnePostBinding.toolbarTitle.text = title
-            ellipTitle = title.substring(0, 30)+"\u2026"
-        }
+        //var ellipTitle = title
+        //if (title!!.length > 30){
+        //    ellipTitle = title.substring(0, 30)+"\u2026"
+        //}
 
-        activityOnePostBinding.toolbarTitle.text = ellipTitle
+        // activityOnePostBinding.toolbarTitle.text = ellipTitle
 
-        //activityOnePostBinding.toolbarTitle.text = bundle?.getString("titleKey")
-        // activityOnePostBinding.toolbarTitle.text = title
-        var oneTextView = activityOnePostBinding.onePostText
+        var oneTextView = activityOnePostBinding.onePostDesc
         oneTextView.movementMethod = ScrollingMovementMethod()
-        activityOnePostBinding.onePostText.text = bundle?.getString("selfTextKey")
+        activityOnePostBinding.onePostDesc.text = bundle?.getString("descKey")
         var img = bundle?.getString("imageKey")
-        var thumbnail = bundle?.getString("thumbnailKey")
-        Glide.glideFetch(img.toString(), thumbnail.toString(),
+        var author = bundle?.getString("authorKey")
+        if (author != null) {
+            if (author.isNotEmpty()){
+                activityOnePostBinding.onePostAuthor.text = bundle?.getString("authorKey")
+            }
+        }
+        activityOnePostBinding.onePostTitle.text = bundle?.getString("titleKey")
+        activityOnePostBinding.onePostLink.text = bundle?.getString("linkKey")
+        activityOnePostBinding.onePostAuthor.text = bundle?.getString("authorKey")
+        Glide.glideFetch(img.toString(), null,
             activityOnePostBinding.onePostImage)
-    }
+        }
     }

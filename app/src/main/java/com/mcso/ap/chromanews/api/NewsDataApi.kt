@@ -17,7 +17,8 @@ import java.lang.reflect.Type
 
 interface NewsDataApi {
     // https://newsdata.io/api/1/news?apikey=YOUR_API_KEY&language=en&category=entertainment
-    @GET("api/1/news?language=en&apiKey=pub_13176ea88c295f0b89581072689b85a83fd3d")
+    // @GET("api/1/news?language=en&apiKey=pub_13176ea88c295f0b89581072689b85a83fd3d")
+    @GET("api/1/news?language=en&apiKey=pub_12303667ee10695fdd352d11f5c219d31f649")
     suspend fun getNews(@Query("category") category: String) : NewsDataResponse
 
     data class NewsDataResponse(

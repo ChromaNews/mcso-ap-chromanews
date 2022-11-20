@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
 
 class BookmarkFragment : Fragment() {
@@ -31,7 +32,7 @@ class BookmarkFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Bookmarks"
+        // (requireActivity() as AppCompatActivity).supportActionBar?.title = "Bookmarks"
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         var adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter

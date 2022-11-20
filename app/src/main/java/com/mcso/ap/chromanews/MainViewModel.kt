@@ -1,5 +1,7 @@
 package com.mcso.ap.chromanews
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.*
 import com.mcso.ap.chromanews.api.*
@@ -39,8 +41,9 @@ class MainViewModel(): ViewModel() {
     private val newsDataList = MediatorLiveData<List<NewsPost>>().apply {
         value = mutableListOf()
     }
-    private var category = MutableLiveData<String>().apply {
-        value = "entertainment"
+
+    private var category = MutableLiveData<List<String>>().apply{
+        value = mutableListOf("top")
     }
 
     // update firebase user
@@ -69,7 +72,7 @@ class MainViewModel(): ViewModel() {
     }
 
     init{
-        netPosts()
+        // netPosts()
     }
 
     fun netPosts(){
@@ -77,21 +80,27 @@ class MainViewModel(): ViewModel() {
             context = viewModelScope.coroutineContext
                     + Dispatchers.IO)
         {
-            Log.d(TAG, fetchList.value.toString())
-            fetchList.postValue(newsDataRepo.getNews(category.value.toString()))
+            Log.d("ANBU: ", fetchList.value.toString())
+            fetchList.postValue(category.value?.let { newsDataRepo.getNews(it.joinToString(','.toString())) })
+            fetchDone.postValue(true)
         }
     }
 
-    fun observeCategory(): LiveData<String> {
+    fun observeCategory(): MutableLiveData<List<String>> {
         return category
     }
 
-    fun setCategory(newCategory: String){
+    fun setCategory(newCategory: MutableList<String>){
+        category.value = emptyList()
         category.value = newCategory
     }
 
     fun observeLiveData(): LiveData<List<NewsPost>> {
         return fetchList
+    }
+
+    fun getCategories(): MutableLiveData<List<String>> {
+        return category
     }
 
     fun observeLiveFavoritesData(): LiveData<List<NewsPost>> {
@@ -141,6 +150,21 @@ class MainViewModel(): ViewModel() {
         return favPostsList.value!!.size
     }
 
+
+    // Convenient place to put it as it is shared
+    companion object {
+        fun doOnePost(context: Context, newsPost: NewsPost) {
+            val onePostIntent = Intent(context, OneNewsPost::class.java)
+
+            onePostIntent.putExtra("titleKey", newsPost.title.toString())
+            onePostIntent.putExtra("descKey", newsPost.description.toString())
+            onePostIntent.putExtra("imageKey", newsPost.imageURL)
+            onePostIntent.putExtra("linkKey", newsPost.link)
+            onePostIntent.putExtra("dateKey", newsPost.pubDate)
+            onePostIntent.putExtra("authorKey", newsPost.creator.toString())
+            context.startActivity(onePostIntent)
+        }
+    }
 
     /**
      * BEGIN RATING SECTION

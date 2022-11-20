@@ -17,6 +17,7 @@ import kotlin.math.abs
 class NewsFeedFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
+    private var default_category = mutableListOf<String>("top")
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -43,10 +44,17 @@ class NewsFeedFragment: Fragment() {
         Log.d(javaClass.simpleName, "ANBU NewsFeedFragment onViewCreated")
         Log.d("NewsFeedFragment onViewCreated", viewModel.subreddit.value.toString())
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "News Feed"
+        // (requireActivity() as AppCompatActivity).supportActionBar?.title = "News Feed"
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
+
+        var category_list = viewModel.getCategories().value
+
+        if (category_list?.isEmpty() == true){
+            viewModel.setCategory(default_category)
+            viewModel.netPosts()
+        }
 
         viewModel.observeLiveData().observe(viewLifecycleOwner){
             Log.d("ANBU: ", "ObserveLiveData")
@@ -56,10 +64,12 @@ class NewsFeedFragment: Fragment() {
 
         viewModel.observeCategory().observe(viewLifecycleOwner){
             viewModel.netPosts()
+            adapter.notifyDataSetChanged()
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener{
             viewModel.netPosts()
+            adapter.notifyDataSetChanged()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
