@@ -47,6 +47,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
 
+    // Firestore
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+
     // viewModels, fragment
     implementation "androidx.fragment:fragment-ktx:1.5.4"
 

@@ -50,6 +50,13 @@ class MainActivity : AppCompatActivity() {
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
+        // test firestore
+        viewModel.calculateRating()
+
+        viewModel.observeRatingByDate().observe(this){
+            viewModel.calculateSentimentColorCode(it)
+        }
+
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.NavHostFragment)
 

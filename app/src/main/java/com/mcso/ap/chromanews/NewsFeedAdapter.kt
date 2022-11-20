@@ -136,6 +136,11 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         } else {
             binding.bookmarkFav.setImageResource(R.drawable.baseline_bookmark_border_24)
         }
+
+        binding.title.setOnClickListener {
+            Log.d(TAG, "analyzing news: $it")
+            viewModel.netAnalyzeNews(item.title)
+        }
     }
 
     class RedditDiff : DiffUtil.ItemCallback<NewsPost>() {

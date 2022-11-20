@@ -14,5 +14,9 @@ class FirebaseUserLiveData : LiveData<FirebaseUser>() {
         value = firebaseAuth.currentUser
     }
 
+    fun getUser(): String? {
+        return firebaseAuth.currentUser?.email
+    }
+
 
 }
