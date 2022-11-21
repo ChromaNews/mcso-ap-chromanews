@@ -6,11 +6,6 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.onNavDestinationSelected
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mcso.ap.chromanews.databinding.ActivityOnePostBinding
 
 
@@ -28,7 +23,7 @@ class OneNewsPost : AppCompatActivity() {
         // supportActionBar?.setDisplayShowTitleEnabled(true)
         // supportActionBar?.setDisplayShowTitleEnabled(false)
         // supportActionBar?.setDisplayShowCustomEnabled(false)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val bundle: Bundle? = intent.extras
 
@@ -56,4 +51,4 @@ class OneNewsPost : AppCompatActivity() {
         Glide.glideFetch(img.toString(), null,
             activityOnePostBinding.onePostImage)
         }
-    }
+}

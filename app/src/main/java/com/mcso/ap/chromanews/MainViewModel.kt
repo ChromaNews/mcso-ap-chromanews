@@ -46,6 +46,10 @@ class MainViewModel(): ViewModel() {
         value = mutableListOf("top")
     }
 
+    private var default_category = MutableLiveData<List<String>>().apply{
+        value = mutableListOf("top", "health", "business", "science")
+    }
+
     // update firebase user
     fun updateUser(){
         firebaseAuthLiveData.updateUser()
@@ -93,6 +97,10 @@ class MainViewModel(): ViewModel() {
     fun setCategory(newCategory: MutableList<String>){
         category.value = emptyList()
         category.value = newCategory
+    }
+
+    fun setDefaultCategory(){
+        category.value = default_category.value
     }
 
     fun observeLiveData(): LiveData<List<NewsPost>> {

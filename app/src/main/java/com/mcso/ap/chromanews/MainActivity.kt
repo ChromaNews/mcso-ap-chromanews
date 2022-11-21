@@ -3,19 +3,22 @@ package com.mcso.ap.chromanews
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
 import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
 
+class MainActivity : AppCompatActivity() {
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewpager: ViewPager
+    private lateinit var simpleFrameLayout: FrameLayout
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
@@ -51,23 +54,64 @@ class MainActivity : AppCompatActivity() {
         AuthInit(viewModel,signInLauncher)
 
         // test firestore
-        viewModel.calculateRating()
+        // viewModel.calculateRating()
 
-        viewModel.observeRatingByDate().observe(this){
-            viewModel.calculateSentimentColorCode(it)
-        }
+        // viewModel.observeRatingByDate().observe(this){
+        //    viewModel.calculateSentimentColorCode(it)
+        // }
 
-        val navView: BottomNavigationView = binding.navView
-        val navController = findNavController(R.id.NavHostFragment)
+        tabLayout = findViewById(R.id.tab_layout)
+        simpleFrameLayout =  findViewById(R.id.simpleFrameLayout)
+        viewpager = findViewById(R.id.view_pager)
+        tabLayout.tabGravity = TabLayout.GRAVITY_FILL
+        val adapter = ViewPagerAdapter(this, supportFragmentManager,
+            tabLayout.tabCount)
+        viewpager.adapter = adapter
+        // tabLayout.setupWithViewPager(viewpager)
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_categories, R.id.navigation_newsfeed, R.id.navigation_bookmark
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        viewpager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                Log.d("ANBU: ", "onTabSelected")
+                /*
+                val selectCat = viewModel.getCategories().value
+                if (selectCat != null) {
+                    Log.d("ANBU: onTabSelected", selectCat.size.toString())
+                    Log.d("ANBU: onTabSelected", selectCat.toString())
+                }
+                if (selectCat != null) {
+                    if (selectCat.isEmpty()){
+                        Log.d("ANBU: ", "Empty onTabSelected")
+                        supportFragmentManager
+                            .beginTransaction()
+                            .add(R.id.recyclerRVView, EmptyFragment())
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                            .commit()
+                    }
+                } */
+                viewpager.currentItem = tab.position
+
+                /*
+                var fragment: Fragment? = null
+
+                when (tab.position) {
+                    0 -> fragment = CategoryFragment()
+                    1 -> fragment = NewsFeedFragment()
+                    2 -> fragment = BookmarkFragment()
+                }
+
+                if (fragment != null) {
+                    supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.simpleFrameLayout, fragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN)
+                        .commit()
+                }
+                 */
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
     }
+
 }
