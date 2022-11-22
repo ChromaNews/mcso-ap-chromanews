@@ -5,11 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
 
 class BookmarkFragment : Fragment() {

@@ -37,6 +37,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
                 var item = getItem(adapterPosition)
 
                 Log.d("ANBU: Item", item.toString())
+
                 MainViewModel.doOnePost(rowPostBinding.root.context, item)
             }
 
@@ -96,14 +97,18 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
 
         binding.title.text = item.title
 
-        binding.selfText.setLines(4)
-        binding.selfText.text = item.description
+        // binding.description.setLines(4)
+        binding.description.text = item.description
         // binding.selfText.text = item.content
 
         binding.title.setTextColor(Color.BLACK)
         binding.PubdateVal.setTextColor(Color.BLACK)
-        binding.selfText.setTextColor(Color.BLACK)
+        binding.description.setTextColor(Color.BLACK)
 
+        if (item.creator?.isEmpty() == false) {
+            binding.authors.text = item.creator!!.joinToString(",")
+            binding.authors.setTextColor(Color.GREEN)
+        }
         Log.d("ANBU: selected item", item.category.toString())
         Log.d("ANBU: category_list ", category_list.toString())
         val catList = mutableListOf<String>()
@@ -113,8 +118,8 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             }
         }
         Log.d("ANBU: catList", catList.toString())
-        binding.Category.text = catList.joinToString(",")
-        binding.Category.setTextColor(Color.GREEN)
+        binding.category.text = catList.joinToString(",")
+        binding.category.setTextColor(Color.BLUE)
 
         // binding.author.text = item.creator.toString()
         //binding.author.setTextColor(Color.BLUE)

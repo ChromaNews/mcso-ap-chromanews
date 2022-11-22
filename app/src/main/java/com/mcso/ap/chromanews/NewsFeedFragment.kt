@@ -63,7 +63,9 @@ class NewsFeedFragment: Fragment() {
         }
 
         viewModel.observeCategory().observe(viewLifecycleOwner){
+            //if (viewModel.getCategories().value?.isEmpty() == false){
             viewModel.netPosts()
+            //}
             adapter.notifyDataSetChanged()
         }
 

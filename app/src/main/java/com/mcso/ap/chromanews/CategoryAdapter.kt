@@ -1,5 +1,6 @@
 package com.mcso.ap.chromanews
 
+import android.content.Context
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.util.SparseBooleanArray
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +24,7 @@ class CategoryAdapter(private val viewModel: MainViewModel)
 
     lateinit var imgid: ImageView
     lateinit var title: TextView
+    private lateinit var context: Context
     private val selectedItems = SparseBooleanArray()
     private val selectedCategory = mutableListOf<String>()
 
@@ -48,9 +51,7 @@ class CategoryAdapter(private val viewModel: MainViewModel)
         // class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         init {
-        //    imgid = itemView.findViewById(R.id.categoryImage)
             imgid = rowBinding.categoryImage.findViewById(R.id.categoryImage)
-        //    title = itemView.findViewById(R.id.categoryText)
             title = rowBinding.categoryText.findViewById(R.id.categoryText)
         }
     }
@@ -63,6 +64,7 @@ class CategoryAdapter(private val viewModel: MainViewModel)
         //    false)
         val rowBinding = RowLayoutBinding.inflate(LayoutInflater.from(parent.context),
             parent, false)
+        context = parent.context
         return VH(rowBinding)
     }
 
@@ -110,8 +112,19 @@ class CategoryAdapter(private val viewModel: MainViewModel)
                 it.setBackgroundColor(Color.RED)
             }
 
-            Log.d("ANBU: CombinedCategory", selectedCategory.toString() )
-            viewModel.setCategory(selectedCategory)
+            Log.d("ANBU: CombinedCategory", selectedCategory.toString())
+            if (selectedCategory.isEmpty()) {
+                Toast.makeText(context, "No category is selected, " +
+                        "so, displaying news feed with all the categories",
+                    Toast.LENGTH_LONG).show()
+
+                viewModel.setDefaultCategory()
+            }
+            else{
+                viewModel.setCategory(selectedCategory)
+            }
+            // viewModel.setCategory(selectedCategory)
+            //}
             Log.d("ANBU: ConfiguredCategory", viewModel.getCategories().value.toString())
         }
     }
