@@ -1,9 +1,10 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.model
 
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.*
+import com.mcso.ap.chromanews.ui.OneNewsPost
 import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
 import com.mcso.ap.chromanews.model.api.SentimentData
@@ -11,8 +12,6 @@ import com.mcso.ap.chromanews.model.auth.FirebaseUserLiveData
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.math.abs
-import kotlin.random.Random
 
 class MainViewModel(): ViewModel() {
 

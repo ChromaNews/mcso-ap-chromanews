@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import com.mcso.ap.chromanews.model.MainViewModel
 
 class AuthInit(viewModel: MainViewModel, signInLauncher: ActivityResultLauncher<Intent>) {
     companion object{

@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.bookmark
 
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
+import com.mcso.ap.chromanews.ui.newsfeed.NewsFeedAdapter
 
 class BookmarkFragment : Fragment() {
     // https://developer.android.com/topic/libraries/view-binding#fragments

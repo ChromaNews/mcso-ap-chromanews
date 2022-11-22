@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".OneNewsPost"
+            android:name=".ui.OneNewsPost"
             android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".MainActivity">
             <meta-data

@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.mcso.ap.chromanews.MainViewModel
+import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.databinding.FragmentMoodColorBinding
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import java.util.*
