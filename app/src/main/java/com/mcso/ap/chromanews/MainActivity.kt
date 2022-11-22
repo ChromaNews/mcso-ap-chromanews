@@ -53,13 +53,6 @@ class MainActivity : AppCompatActivity() {
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
-        // test firestore
-        // viewModel.calculateRating()
-
-        // viewModel.observeRatingByDate().observe(this){
-        //    viewModel.calculateSentimentColorCode(it)
-        // }
-
         tabLayout = findViewById(R.id.tab_layout)
         simpleFrameLayout =  findViewById(R.id.simpleFrameLayout)
         viewpager = findViewById(R.id.view_pager)

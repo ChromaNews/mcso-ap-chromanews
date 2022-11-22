@@ -3,6 +3,7 @@ package com.mcso.ap.chromanews
 import android.content.Context
 import androidx.fragment.app.*
 import androidx.fragment.app.Fragment
+import com.mcso.ap.chromanews.ui.sentiment.MoodColorFragment
 
 @Suppress("DEPRECATION")
 internal class ViewPagerAdapter(
@@ -26,6 +27,9 @@ internal class ViewPagerAdapter(
             }
             2 -> {
                 BookmarkFragment()
+            }
+            3 -> {
+                MoodColorFragment()
             }
             else -> CategoryFragment()
         }
