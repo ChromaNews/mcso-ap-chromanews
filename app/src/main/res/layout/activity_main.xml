@@ -29,6 +29,11 @@
             android:layout_height="wrap_content"
             android:text="Bookmarks"/>
 
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sentiment"/>
+
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager.widget.ViewPager

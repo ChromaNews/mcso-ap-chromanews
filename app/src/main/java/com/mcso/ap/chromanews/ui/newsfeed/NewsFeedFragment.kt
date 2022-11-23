@@ -1,17 +1,16 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.model.MainViewModel
 
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
-import kotlin.math.abs
 
 
 class NewsFeedFragment: Fragment() {

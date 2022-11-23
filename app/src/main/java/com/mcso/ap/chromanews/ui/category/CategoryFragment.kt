@@ -1,18 +1,16 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.category
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.api.Repository
-import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
 
 

@@ -1,8 +1,9 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.bookmark
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.mcso.ap.chromanews.model.MainViewModel
 
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
 

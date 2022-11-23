@@ -7,12 +7,12 @@ import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.mcso.ap.chromanews.databinding.ActivityMainBinding
+import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.ui.ViewPagerAdapter
 
 
 class MainActivity : AppCompatActivity() {
@@ -52,13 +52,6 @@ class MainActivity : AppCompatActivity() {
 
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
-
-        // test firestore
-        // viewModel.calculateRating()
-
-        // viewModel.observeRatingByDate().observe(this){
-        //    viewModel.calculateSentimentColorCode(it)
-        // }
 
         tabLayout = findViewById(R.id.tab_layout)
         simpleFrameLayout =  findViewById(R.id.simpleFrameLayout)

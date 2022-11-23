@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.category
 
 import android.content.Context
 import android.graphics.Color
@@ -9,9 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.util.SparseBooleanArray
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.R
 import com.mcso.ap.chromanews.api.RecyclerData
 import com.mcso.ap.chromanews.databinding.RowLayoutBinding
 import java.util.*
@@ -57,7 +57,7 @@ class CategoryAdapter(private val viewModel: MainViewModel)
     }
 
     // Usually involves inflating a layout from XML and returning the holder
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH  {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
 
         // Inflate the custom layout
        //  var view = LayoutInflater.from(parent.context).inflate(R.layout.row_layout, parent,

@@ -1,11 +1,10 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui
 
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.mcso.ap.chromanews.Glide
 import com.mcso.ap.chromanews.databinding.ActivityOnePostBinding
 
 
