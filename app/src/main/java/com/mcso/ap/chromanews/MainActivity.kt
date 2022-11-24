@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         tabLayout = findViewById(R.id.tab_layout)
         simpleFrameLayout =  findViewById(R.id.simpleFrameLayout)
         viewpager = findViewById(R.id.view_pager)
-        tabLayout.tabGravity = TabLayout.GRAVITY_FILL
+        //tabLayout.tabGravity = TabLayout.GRAVITY_FILL
         val adapter = ViewPagerAdapter(this, supportFragmentManager,
             tabLayout.tabCount)
         viewpager.adapter = adapter

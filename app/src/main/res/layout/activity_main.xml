@@ -11,6 +11,8 @@
     <com.google.android.material.tabs.TabLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:tabMode="scrollable"
         app:tabTextAppearance="@style/CustomTextAppearanceTab"
         android:id="@+id/tab_layout">
 
@@ -33,6 +35,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Sentiment"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Conflicts"/>
 
     </com.google.android.material.tabs.TabLayout>
 

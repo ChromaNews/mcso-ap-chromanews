@@ -5,6 +5,7 @@ import androidx.fragment.app.*
 import androidx.fragment.app.Fragment
 import com.mcso.ap.chromanews.ui.bookmark.BookmarkFragment
 import com.mcso.ap.chromanews.ui.category.CategoryFragment
+import com.mcso.ap.chromanews.ui.conflict.ConflictMapFragment
 import com.mcso.ap.chromanews.ui.newsfeed.NewsFeedFragment
 import com.mcso.ap.chromanews.ui.sentiment.MoodColorFragment
 
@@ -33,6 +34,9 @@ internal class ViewPagerAdapter(
             }
             3 -> {
                 MoodColorFragment()
+            }
+            4 -> {
+                ConflictMapFragment()
             }
             else -> CategoryFragment()
         }

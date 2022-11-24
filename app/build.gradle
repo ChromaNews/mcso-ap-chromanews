@@ -50,6 +50,9 @@ dependencies {
     // Firestore
     implementation 'com.google.firebase:firebase-firestore-ktx'
 
+    // google maps
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+
     // viewModels, fragment
     implementation "androidx.fragment:fragment-ktx:1.5.4"
 
