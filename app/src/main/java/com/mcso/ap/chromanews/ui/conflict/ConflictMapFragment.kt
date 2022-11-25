@@ -1,6 +1,7 @@
 package com.mcso.ap.chromanews.ui.conflict
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
@@ -46,9 +47,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     private val viewModel: MainViewModel by viewModels()
     private val binding get() = _binding!!
     private val conflictDetailsBinding get() = _conflictDetailsBinding
-
-
-    private lateinit var conflictsDataSender: ConflictDataSender
     private lateinit var _conflictDetailsBinding: ConflictDetailsBinding
 
     override fun onCreateView(
@@ -85,7 +83,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        conflictDetailsBinding.conflictDetails.visibility = View.GONE
+        conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -115,7 +113,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         conflictsMap.setOnMapClickListener {
 
             // hide layout
-            conflictDetailsBinding.root.visibility = View.GONE
+            conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
 
             val markerLocation = it
             val markerLat = markerLocation.latitude
@@ -150,7 +148,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                         }
 
                         if (conflictsList.size > 0){
-                            conflictsMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 50))
+                            conflictsMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 150))
                         } else {
                             conflictsMap.clear()
                             Toast.makeText(requireContext(), "Peace!", Toast.LENGTH_SHORT).show()
@@ -164,13 +162,46 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showData(marker: Marker): Boolean {
         marker.showInfoWindow()
+
         val conflictInfo : Conflicts? = viewModel.getConflictForLocation(marker.title.toString())
-        conflictDetailsBinding.root.visibility = View.VISIBLE
-        Log.d(TAG, "setting notes for ${conflictInfo?.notes}")
-        conflictDetailsBinding.notes.text = conflictInfo?.notes
+
+        if (conflictInfo != null){
+            conflictDetailsBinding.scrollableConflictDetails.visibility = View.VISIBLE
+            conflictDetailsBinding.sources.text = conflictInfo.source
+
+            setNotes(conflictInfo.notes)
+            setActors(conflictInfo.actor_one, conflictInfo.actor_two)
+
+            conflictDetailsBinding.eventDate.text = conflictInfo.date
+        }
+
         return true
+    }
+
+    private fun setNotes(notes: String){
+        val bracketIndex = notes.indexOf("[")
+        var eventNotes = "-empty-"
+        if (bracketIndex > 0){
+            eventNotes = notes.substring(0, bracketIndex)
+        }
+
+        conflictDetailsBinding.notes.text = eventNotes
+    }
+
+    private fun setActors(actor_one: String, actor_two: String){
+        var actorsText = "unknown"
+        if (actor_one.isNotEmpty()){
+            actorsText = actor_one
+
+            if (actor_two.isNotEmpty()){
+                actorsText += " vs $actor_two"
+            }
+        }
+
+        conflictDetailsBinding.actors.text = actorsText
     }
 
     override fun onResume() {
@@ -180,10 +211,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-    }
-
-    public interface ConflictDataSender{
-        public fun sendConflictInfo(conflictInfo: Conflicts)
     }
 
     private fun checkGooglePlayServices() {

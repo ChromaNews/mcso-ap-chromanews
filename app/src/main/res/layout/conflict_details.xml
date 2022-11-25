@@ -1,15 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/conflict_details"
-    android:visibility="invisible"
-    android:orientation="vertical">
+    android:id="@+id/scrollable_conflict_details"
+    android:scrollbars="vertical"
+    android:visibility="gone">
 
-    <TextView
-        android:id="@+id/notes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/conflict_details"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/sources"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/blue_dark"
+                    android:textAllCaps="true"
+                    android:layout_marginBottom="10dp"
+                    />
+
+                <TextView
+                    android:id="@+id/dateText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="Event Date"
+                    android:textColor="@color/black"
+                    android:textAllCaps="true"
+                    />
+
+                <TextView
+                    android:id="@+id/eventDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="6dp"
+                    />
+
+                <TextView
+                    android:id="@+id/notesText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="Info"
+                    android:textColor="@color/black"
+                    android:textAllCaps="true"
+                    />
+
+                <TextView
+                    android:id="@+id/notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="6dp"
+                    />
+
+                <TextView
+                    android:id="@+id/actorsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="Involved Parties"
+                    android:textColor="@color/black"
+                    android:textAllCaps="true"
+                    />
+
+                <TextView
+                    android:id="@+id/actors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="6dp"
+                    />
+
+        </LinearLayout>
+
+</ScrollView>
