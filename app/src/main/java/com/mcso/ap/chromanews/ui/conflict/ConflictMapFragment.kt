@@ -4,11 +4,13 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -22,10 +24,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mcso.ap.chromanews.R
+import com.mcso.ap.chromanews.databinding.ConflictDetailsBinding
 import com.mcso.ap.chromanews.databinding.FragmentConflictMapBinding
 import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.model.conflict.Conflicts
 
 class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
@@ -33,13 +38,18 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         private val TAG = "ConflictMapFragment"
     }
 
-    private lateinit var _binding: FragmentConflictMapBinding
+    private var _binding: FragmentConflictMapBinding? = null
     private lateinit var conflictsMap: GoogleMap
     private lateinit var geocoder: Geocoder
     private lateinit var progressBar: ProgressBar
     private var locationPermissionGranted = false
     private val viewModel: MainViewModel by viewModels()
-    private val binding get() = _binding
+    private val binding get() = _binding!!
+    private val conflictDetailsBinding get() = _conflictDetailsBinding
+
+
+    private lateinit var conflictsDataSender: ConflictDataSender
+    private lateinit var _conflictDetailsBinding: ConflictDetailsBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,7 +57,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentConflictMapBinding.inflate(inflater, container, false)
-        return _binding.root
+        _conflictDetailsBinding = _binding!!.conflictSection
+        return _binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,6 +84,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+
+        conflictDetailsBinding.conflictDetails.visibility = View.GONE
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -96,7 +109,13 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     private fun getConflictLocations(){
 
         conflictsMap.uiSettings.isZoomControlsEnabled = true
+        conflictsMap.setOnMarkerClickListener {
+            showData(it)
+        }
         conflictsMap.setOnMapClickListener {
+
+            // hide layout
+            conflictDetailsBinding.root.visibility = View.GONE
 
             val markerLocation = it
             val markerLat = markerLocation.latitude
@@ -122,7 +141,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                                     "Conflict location: ${conflict.location} (${conflict.latitude}, ${conflict.longitude})")
 
                                 val conflictLatLng = LatLng(conflict.latitude.toDouble(), conflict.longitude.toDouble())
-                                val markerOption = MarkerOptions().position(conflictLatLng).title(conflict.location)
+                                val markerOption = MarkerOptions().position(conflictLatLng)
+                                    .title(conflict.location)
                                 conflictsMap.addMarker(markerOption)
 
                                 latLngBounds.include(conflictLatLng)
@@ -144,16 +164,37 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun showData(marker: Marker): Boolean {
+        marker.showInfoWindow()
+        val conflictInfo : Conflicts? = viewModel.getConflictForLocation(marker.title.toString())
+        conflictDetailsBinding.root.visibility = View.VISIBLE
+        Log.d(TAG, "setting notes for ${conflictInfo?.notes}")
+        conflictDetailsBinding.notes.text = conflictInfo?.notes
+        return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+    public interface ConflictDataSender{
+        public fun sendConflictInfo(conflictInfo: Conflicts)
+    }
+
     private fun checkGooglePlayServices() {
         val googleApiAvailability = GoogleApiAvailability.getInstance()
         val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(requireContext())
         if (resultCode != ConnectionResult.SUCCESS) {
-            if (resultCode?.let { googleApiAvailability.isUserResolvableError(it) } == true) {
+            if (resultCode.let { googleApiAvailability.isUserResolvableError(it) }) {
                 googleApiAvailability.getErrorDialog(this, resultCode, 257)?.show()
             } else {
                 Log.i(javaClass.simpleName,
                     "This device must install Google Play Services.")
-
                 // TODO - finish()
             }
         }

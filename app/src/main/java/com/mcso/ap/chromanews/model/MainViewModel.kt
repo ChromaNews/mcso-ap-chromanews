@@ -9,6 +9,7 @@ import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
 import com.mcso.ap.chromanews.model.api.SentimentData
 import com.mcso.ap.chromanews.model.auth.FirebaseUserLiveData
+import com.mcso.ap.chromanews.model.conflict.Conflicts
 import com.mcso.ap.chromanews.model.conflict.ConflictsResponse
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import kotlinx.coroutines.Dispatchers
@@ -225,6 +226,19 @@ class MainViewModel(): ViewModel() {
 
     fun observeConflictData(): LiveData<ConflictsResponse> {
         return conflictLiveData
+    }
+
+    fun getConflictForLocation(markerLocation: String): Conflicts? {
+        var conflictInfo: Conflicts? = null
+        val conflicts: List<Conflicts>? = conflictLiveData.value?.conflictList?.filter {
+            conflicts -> conflicts.location == markerLocation
+        }
+
+        if (conflicts != null && conflicts.isNotEmpty()) {
+            conflictInfo = conflicts[0]
+        }
+
+        return conflictInfo
     }
 
     fun observeShowProgress(): LiveData<Boolean> {

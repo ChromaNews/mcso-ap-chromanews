@@ -41,6 +41,7 @@ internal class ViewPagerAdapter(
             else -> CategoryFragment()
         }
     }
+
     override fun getCount(): Int {
         return totalTabs
     }
