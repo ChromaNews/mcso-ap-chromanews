@@ -5,13 +5,11 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -83,6 +81,10 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
+
+        conflictDetailsBinding.closeButton.setOnClickListener {
+            conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
+        }
         conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
     }
 
@@ -114,6 +116,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
             // hide layout
             conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
+
 
             val markerLocation = it
             val markerLat = markerLocation.latitude
@@ -169,8 +172,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         val conflictInfo : Conflicts? = viewModel.getConflictForLocation(marker.title.toString())
 
         if (conflictInfo != null){
+            conflictDetailsBinding.root.visibility = View.VISIBLE
             conflictDetailsBinding.scrollableConflictDetails.visibility = View.VISIBLE
-            conflictDetailsBinding.sources.text = conflictInfo.source
 
             setNotes(conflictInfo.notes)
             setActors(conflictInfo.actor_one, conflictInfo.actor_two)
