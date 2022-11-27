@@ -13,18 +13,17 @@ import com.mcso.ap.chromanews.databinding.FragmentRvBinding
 import kotlin.math.abs
 
 
-class HealthFragment: Fragment() {
+class SportsFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
-    private var default_category = mutableListOf<String>("business")
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance(): HealthFragment {
+        fun newInstance(): SportsFragment {
             Log.d("ANBU: ", "instance")
-            return HealthFragment()
+            return SportsFragment()
         }
     }
 
@@ -37,6 +36,7 @@ class HealthFragment: Fragment() {
         _binding = FragmentRvBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,36 +67,26 @@ class HealthFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(javaClass.simpleName, "ANBU NewsFeedFragment onViewCreated")
-        Log.d("NewsFeedFragment onViewCreated", viewModel.subreddit.value.toString())
 
         // (requireActivity() as AppCompatActivity).supportActionBar?.title = "News Feed"
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
 
-        // var category_list = viewModel.getCategories().value
-
-        // if (category_list?.isEmpty() == true){
-        //    viewModel.setCategory(default_category)
-        //    viewModel.netPosts()
-        //}
-
         viewModel.observeLiveData().observe(viewLifecycleOwner){
             Log.d("ANBU: ", "ObserveLiveData")
-            adapter.submitList(it)
+            adapter.submitList(it){
+                binding.recyclerRVView.scrollToPosition(0)
+            }
             adapter.notifyDataSetChanged()
         }
 
         viewModel.observeCategory().observe(viewLifecycleOwner){
-            //if (viewModel.getCategories().value?.isEmpty() == false){
             viewModel.netPosts()
-            //}
-            // adapter.notifyDataSetChanged()
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener{
             viewModel.netPosts()
-            // adapter.notifyDataSetChanged()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {

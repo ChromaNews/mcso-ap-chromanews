@@ -10,17 +10,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mcso.ap.chromanews.api.NewsPost
-import com.mcso.ap.chromanews.databinding.RowPostBinding
+import com.mcso.ap.chromanews.databinding.NewsPostBinding
+import java.util.*
 
-
-// https://developer.android.com/reference/androidx/recyclerview/widget/ListAdapter
-// Slick adapter that provides submitList, so you don't worry about how to update
-// the list, you just submit a new one when you want to change the list and the
-// Diff class computes the smallest set of changes that need to happen.
-// NB: Both the old and new lists must both be in memory at the same time.
-// So you can copy the old list, change it into a new list, then submit the new list.
-//
-// You can call adapterPosition to get the index of the selected item
 class NewsFeedAdapter(private val viewModel: MainViewModel)
     : ListAdapter<NewsPost, NewsFeedAdapter.VH>(RedditDiff()) {
 
@@ -28,7 +20,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         val TAG = "NewsFeedAdapter"
     }
 
-    inner class VH(val rowPostBinding : RowPostBinding)
+    inner class VH(val rowPostBinding : NewsPostBinding)
         : RecyclerView.ViewHolder(rowPostBinding.root) {
         init {
 
@@ -49,34 +41,59 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_TEXT, getItem(adapterPosition).link)
-                startActivity(it.context,
+                startActivity(
+                    it.context,
                     Intent.createChooser(shareIntent, "Share link using"),
-                    null)
+                    null
+                )
             }
 
             rowPostBinding.bookmarkFav.setOnClickListener {
-                Log.d("ANBU: rowFav Selected", "rowFav Selected")
+                Log.d("ANBU: ", "Bookmark Selected")
                 val position = adapterPosition
-                // Toggle Favorite
+                // Toggle Bookmark
                 val local = viewModel.getItemAt(position)
-                Log.d("ANBU: favorite-1", local.toString())
+                Log.d("ANBU: Bookmark-1", local.toString())
 
-                if(viewModel.isFav(getItem(position))) {
-                    viewModel.removeFav(getItem(position))
-                    // notifyDataSetChanged()
+                if (viewModel.isFav(getItem(position))) {
+                    // viewModel.removeFav(getItem(position))
+                    Log.d("ANUB", "Already bookmarked")
                 } else {
                     viewModel.addFav(getItem(position))
-                    // notifyDataSetChanged()
-                }
-                notifyDataSetChanged()
-                // notifyItemChanged(position)
+
+                    val uuid = UUID.randomUUID().toString()
+                    // for storing in firebase database
+                    val item = viewModel.getItemAt(position)
+
+                    if (item != null) {
+                        Log.d("ANBU: ", "calling createNewsMetadata")
+                        Log.d("ANBU: ", item.description.toString() )
+                        Log.d("ANBU: ", item.title.toString() )
+                        Log.d("ANBU: ", item.author.toString() )
+                        Log.d("ANBU: ", item.link.toString() )
+                        Log.d("ANBU: ", item.imageURL.toString() )
+                        item.description?.let { it1 ->
+                            item.imageURL?.let { it2 ->
+                                    viewModel.createNewsMetadata(
+                                        uuid,
+                                        item.title,
+                                        item.pubDate,
+                                        it1,
+                                        it2,
+                                        item.link
+                                    )
+                                }
+                        }
+                    }
+                    notifyDataSetChanged()
                 }
             }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
 
-        val rowBinding = RowPostBinding.inflate(LayoutInflater.from(parent.context),
+        val rowBinding = NewsPostBinding.inflate(LayoutInflater.from(parent.context),
             parent, false)
 
         return VH(rowBinding)
@@ -99,30 +116,14 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
 
         // binding.description.setLines(4)
         binding.description.text = item.description
-        // binding.selfText.text = item.content
 
         binding.title.setTextColor(Color.BLACK)
         binding.PubdateVal.setTextColor(Color.BLACK)
         binding.description.setTextColor(Color.BLACK)
 
-        if (item.creator?.isEmpty() == false) {
-            binding.authors.text = item.creator!!.joinToString(",")
-            binding.authors.setTextColor(Color.GREEN)
-        }
-        Log.d("ANBU: selected item", item.category.toString())
-        Log.d("ANBU: category_list ", category_list.toString())
-        val catList = mutableListOf<String>()
-        for (i in item.category) {
-            if (category_list?.contains(i) == true){
-                catList.add(i)
-            }
-        }
-        Log.d("ANBU: catList", catList.toString())
-        binding.category.text = catList.joinToString(",")
-        binding.category.setTextColor(Color.BLUE)
-
-        // binding.author.text = item.creator.toString()
-        //binding.author.setTextColor(Color.BLUE)
+        binding.authors.text = item.author
+        binding.authors.setTextColor(Color.GREEN)
+        // binding.category.text = viewModel.getCategories().value.toString()
 
         if (item.imageURL != null){
             Glide.glideFetch(item.imageURL, null , binding.image)
@@ -134,7 +135,13 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         else{
             binding.link.text = item.link
         }
-        binding.PubdateVal.text = item.pubDate
+
+        var delimeter_1 = "T"
+        var delimeter_2 = "Z"
+
+        var modified_datetime = item.pubDate.split(delimeter_1, delimeter_2)
+
+        binding.PubdateVal.text = modified_datetime.joinToString(" ")
 
         if (viewModel.isFav(item)) {
             binding.bookmarkFav.setImageResource(R.drawable.baseline_bookmark_24)
@@ -148,6 +155,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         }
     }
 
+
     class RedditDiff : DiffUtil.ItemCallback<NewsPost>() {
         override fun areItemsTheSame(oldItem: NewsPost, newItem: NewsPost): Boolean {
             return oldItem.title == newItem.title
@@ -158,6 +166,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             return oldItem.title == newItem.title
         }
     }
+
 }
 
 

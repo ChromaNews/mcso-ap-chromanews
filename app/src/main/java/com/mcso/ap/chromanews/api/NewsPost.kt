@@ -10,30 +10,39 @@ import com.google.gson.annotations.SerializedName
 data class NewsPost (
     @SerializedName("title")
     val title: String,
-    @SerializedName("link")
+    // val title: SpannableString,
+    // @SerializedName("link")
+    @SerializedName("url")
     val link: String,
-    @SerializedName("keywords")
-    val keywords: List<String>? = null,
-    @SerializedName("creator")
-    val creator: List<String>? = null,
-    @SerializedName("video_url")
-    val videoURL: String?,
+    // @SerializedName("keywords")
+    // val keywords: List<String>? = null,
+    // @SerializedName("creator")
+    @SerializedName("author")
+    val author: String? = null,
+    // val creator: List<String>? = null,
+   //  @SerializedName("video_url")
+    // val videoURL: String?,
     @SerializedName("description")
     val description: String? = null,
+    // val description: SpannableString,
     @SerializedName("content")
     val content: String? = null,
-    @SerializedName("pubDate")
+    // @SerializedName("pubDate")
+    @SerializedName("publishedAt")
     val pubDate : String,
-    @SerializedName("image_url")
+    // @SerializedName("image_url")
+    @SerializedName("urlToImage")
     val imageURL : String?,
-    @SerializedName("source_id")
-    val sourceId: String,
-    @SerializedName("country")
-    val country: List<String>,
-    @SerializedName("category")
-    val category: List<String>,
-    @SerializedName("language")
-    val language: String
+    // @SerializedName("source_id")
+    // val sourceId: String,
+    // @SerializedName("source")
+    // val source: Map<Int,String>
+    // @SerializedName("country")
+    // val country: List<String>,
+    // @SerializedName("category")
+    // val category: List<String>,
+    // @SerializedName("language")
+    // val language: String
 ) {
     companion object {
         // NB: This only highlights the first match in a string
@@ -73,7 +82,7 @@ data class NewsPost (
     private fun removeAllCurrentSpans(){
         // Erase all spans
         // clearSpan(title)
-        //clearSpan(description)
+        // clearSpan(description)
         // clearSpan(content)
         // clearSpan(category)
     }
@@ -82,7 +91,6 @@ data class NewsPost (
     // highlight it and return true, otherwise return false.
     fun searchFor(searchTerm: String): Boolean {
         // XXX Write me, search both regular posts and subreddit listings
-
         return true
     }
 

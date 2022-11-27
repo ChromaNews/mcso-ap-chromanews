@@ -3,28 +3,24 @@ package com.mcso.ap.chromanews
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
-import kotlin.math.abs
 
 
-class NewsFeedFragment: Fragment() {
+class BusinessFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
-    private var default_category = mutableListOf<String>("business")
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance(): NewsFeedFragment {
+        fun newInstance(): BusinessFragment {
             Log.d("ANBU: ", "instance")
-            return NewsFeedFragment()
+            return BusinessFragment()
         }
     }
 
@@ -37,6 +33,7 @@ class NewsFeedFragment: Fragment() {
         _binding = FragmentRvBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,32 +63,25 @@ class NewsFeedFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(javaClass.simpleName, "ANBU NewsFeedFragment onViewCreated")
-        Log.d("NewsFeedFragment onViewCreated", viewModel.subreddit.value.toString())
+        Log.d(javaClass.simpleName, "ANBU BusinessFragment onViewCreated")
 
         // (requireActivity() as AppCompatActivity).supportActionBar?.title = "News Feed"
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
 
-        // var category_list = viewModel.getCategories().value
-
-        // if (category_list?.isEmpty() == true){
-        //    viewModel.setCategory(default_category)
-        //    viewModel.netPosts()
-        //}
-
         viewModel.observeLiveData().observe(viewLifecycleOwner){
             Log.d("ANBU: ", "ObserveLiveData")
-            adapter.submitList(it)
+            adapter.submitList(it){
+                binding.recyclerRVView.scrollToPosition(0)
+            }
             adapter.notifyDataSetChanged()
         }
 
         viewModel.observeCategory().observe(viewLifecycleOwner){
             //if (viewModel.getCategories().value?.isEmpty() == false){
             viewModel.netPosts()
-            //}
-            // adapter.notifyDataSetChanged()
+            adapter.notifyDataSetChanged()
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener{

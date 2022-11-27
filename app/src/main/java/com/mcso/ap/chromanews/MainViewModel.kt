@@ -2,7 +2,12 @@ package com.mcso.ap.chromanews
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
+import androidx.core.text.clearSpans
 import androidx.lifecycle.*
 import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
@@ -13,6 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.random.Random
+import com.mcso.ap.chromanews.db.NewsDBHelper
+import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 
 class MainViewModel(): ViewModel() {
 
@@ -42,12 +49,74 @@ class MainViewModel(): ViewModel() {
         value = mutableListOf()
     }
 
-    private var category = MutableLiveData<List<String>>().apply{
-        value = mutableListOf("top")
+    // fun getCurrentUser() : FirebaseUser? {
+    //    return firebaseAuth.currentUser
+    //}
+
+    // for bookmarked news
+    private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
+    private var savedNewsList = MutableLiveData<List<NewsMetaData>>()
+    // private var filterbookmarkedList = MutableLiveData<List<NewsMetaData>>()
+
+    fun fetchSavedNewsList() {
+        savednewsDataDB.fetchSavedNews(savedNewsList)
+        // filterbookmarkedList = savedNewsList
     }
 
-    private var default_category = MutableLiveData<List<String>>().apply{
-        value = mutableListOf("top", "health", "business", "science")
+    fun observeSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
+        return savedNewsList
+    }
+
+    fun getSavedNewsCount(): Int? {
+        return savedNewsList.value?.size
+    }
+
+    private var category = MutableLiveData<String>().apply{
+        value = "business"
+    }
+
+    // fun setBookmarkList(bookMlist: List<NewsMetaData>){
+    //    filterbookmarkedList.postValue(bookMlist)
+    // }
+
+    fun getNewsMeta(position: Int) : NewsMetaData {
+        val news = savedNewsList.value?.get(position)
+        return news!!
+    }
+
+    fun createNewsMetadata(uuid: String, title: String, pubDate: String, description: String,
+                           imageURL: String, link: String){
+
+        val newsMeta = NewsMetaData(
+            newsID = uuid,
+            title = title,
+            description = description,
+            imageURL = imageURL,
+            link = link,
+            pubDate = pubDate,
+            firestoreID = ""
+        )
+        savednewsDataDB.createNewsMetadata(newsMeta, savedNewsList)
+    }
+
+    fun getSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
+        return savedNewsList
+    }
+
+    fun removeSavedNews(position: Int){
+        val news = getNewsMeta(position)
+        var newsPost: NewsPost? = null
+
+        for (item in favPostsList.value!!){
+            if (item.title == news.title){
+                newsPost = item
+                break
+            }
+        }
+        savednewsDataDB.removeNewsMetadata(news, savedNewsList)
+        if (newsPost != null) {
+            removeFav(newsPost)
+        }
     }
 
     // update firebase user
@@ -58,15 +127,8 @@ class MainViewModel(): ViewModel() {
     private var title = MutableLiveData<String>()
     private var searchTerm: MutableLiveData<String> = MutableLiveData("")
     var fetchDone : MutableLiveData<Boolean> = MutableLiveData(false)
-    var subreddit = MutableLiveData<String>().apply {
-        value = "entertainment"
-    }
 
     var fetchList = MediatorLiveData<List<NewsPost>>().apply {
-        value = mutableListOf()
-    }
-
-    var subredditList = MediatorLiveData<List<NewsPost>>().apply {
         value = mutableListOf()
     }
 
@@ -75,8 +137,14 @@ class MainViewModel(): ViewModel() {
         value = mutableListOf()
     }
 
+    // setting search term
+    fun setSearchTerm(s: String) {
+        searchTerm.value = s
+    }
+
     init{
         // netPosts()
+        fetchSavedNewsList()
     }
 
     fun netPosts(){
@@ -84,35 +152,27 @@ class MainViewModel(): ViewModel() {
             context = viewModelScope.coroutineContext
                     + Dispatchers.IO)
         {
-            Log.d("ANBU: ", fetchList.value.toString())
-            fetchList.postValue(category.value?.let { newsDataRepo.getNews(it.joinToString(','.toString())) })
+            Log.d("ANBU: Category configured", category.value.toString())
+            fetchList.postValue(category.value?.let { newsDataRepo.getNews(category.value.toString()) })
             fetchDone.postValue(true)
         }
     }
 
-    fun observeCategory(): MutableLiveData<List<String>> {
+    fun observeCategory(): MutableLiveData<String> {
         return category
     }
 
-    fun setCategory(newCategory: MutableList<String>){
-        category.value = emptyList()
+    fun setCategory(newCategory: String){
+        // category.value = emptyList()
         category.value = newCategory
-    }
-
-    fun setDefaultCategory(){
-        category.value = default_category.value
     }
 
     fun observeLiveData(): LiveData<List<NewsPost>> {
         return fetchList
     }
 
-    fun getCategories(): MutableLiveData<List<String>> {
+    fun getCategories(): MutableLiveData<String> {
         return category
-    }
-
-    fun observeLiveFavoritesData(): LiveData<List<NewsPost>> {
-        return favPostsList
     }
 
     fun removeFav(albumRec: NewsPost) {
@@ -128,11 +188,13 @@ class MainViewModel(): ViewModel() {
 
     fun isFav(albumRec: NewsPost): Boolean {
         var fav =  favPostsList.value?.contains(albumRec) ?: false
+       // var fav = savedNewsList.value.contains(albumRec) ?: false
 
         Log.d("ANBU: isFav : ", albumRec.toString())
         Log.d("ANBU: isFav exists: ", fav.toString())
         return fav
     }
+
 
     fun getItemAt(position: Int) : NewsPost? {
         val localList = fetchList.value?.toList()
@@ -144,8 +206,6 @@ class MainViewModel(): ViewModel() {
     }
 
     fun addFav(albumRec: NewsPost) {
-        // favPosts.add(albumRec)
-        // favPostsList.value = favPosts
         val localList = favPostsList.value?.toMutableList()
         localList?.let {
             it.add(albumRec)
@@ -154,22 +214,125 @@ class MainViewModel(): ViewModel() {
         Log.d("ANBU addFav ", favPostsList.value.toString())
     }
 
-    fun getFavoriteCount() : Int {
-        return favPostsList.value!!.size
+    // Search posts
+    private fun setSpan(fulltext: SpannableString, subtext: String): Boolean {
+        if( subtext.isEmpty() ) return true
+        val i = fulltext.indexOf(subtext, ignoreCase = true)
+        if( i == -1 ) return false
+        fulltext.setSpan(
+            ForegroundColorSpan(Color.BLUE), i, i + subtext.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        
+        return true
     }
 
+    private fun clearSpan(str: SpannableString?) {
+        str?.clearSpans()
+        str?.setSpan(
+            ForegroundColorSpan(Color.GRAY), 0, 0,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+
+    private fun removeAllCurrentSpans(){
+        fetchList.value?.forEach {
+            SpannableString(it.title).clearSpans()
+            // clearSpan(SpannableString(it.title))
+           // SpannableString(it.description!!).clearSpans()
+        }
+    }
+
+    private fun removeAllSubredditCurrentSpans(){
+        savedNewsList.value?.forEach {
+            SpannableString(it.title).clearSpans()
+            // it.description!!.clearSpans()
+        }
+    }
+
+    private var searchPosts = MediatorLiveData<List<NewsPost>>().apply {
+        addSource(fetchList)  { value = filterList() }
+        addSource(searchTerm)  { value = filterList() }
+
+        Log.d("ANBU: NewsFeedFragment", fetchList.value.toString())
+        value = fetchList.value
+    }
+
+    private var searchBookmarkPosts = MediatorLiveData<List<NewsMetaData>>().apply {
+        addSource(savedNewsList) { value = filterBookmarkList()}
+        addSource(searchTerm)  { value = filterBookmarkList()}
+
+        Log.d("ANBU: BookmarkFragment", savedNewsList.value.toString())
+        value = savedNewsList.value
+    }
+
+    private fun filterList(): List<NewsPost> {
+        Log.d(javaClass.simpleName,
+            "FeedList Filter $searchTerm Q(${title.value})")
+
+        removeAllCurrentSpans()
+
+        val searchTermValue = searchTerm.value!!
+        return fetchList.value!!.filter {
+            var titleFound = false
+            // var selfTextFound = false
+            titleFound = setSpan(SpannableString(it.title), searchTermValue)
+            // selfTextFound = setSpan(SpannableString(it.description), searchTermValue.toString())
+
+           // titleFound || selfTextFound
+            titleFound
+        }
+    }
+
+    private fun filterBookmarkList(): List<NewsMetaData> {
+        Log.d(javaClass.simpleName,
+            "BookmarkFragment Filter $searchTerm Q(${title.value})")
+
+        removeAllSubredditCurrentSpans()
+
+        val searchTermValue = searchTerm.value!!
+        return savedNewsList.value!!.filter {
+            var displayFound = false
+            //var publicDescFound = false
+            displayFound = setSpan(SpannableString(it.title), searchTermValue)
+            //publicDescFound = setSpan(SpannableString(it.description), searchTermValue)
+
+            displayFound
+            //displayFound || publicDescFound
+        }
+    }
+
+    fun observeSearchPostLiveData(): LiveData<List<NewsPost>>{
+        return searchPosts
+    }
+
+    fun observeBookmarkSearchPostLiveData(): LiveData<List<NewsMetaData>>{
+        return searchBookmarkPosts
+    }
 
     // Convenient place to put it as it is shared
     companion object {
         fun doOnePost(context: Context, newsPost: NewsPost) {
-            val onePostIntent = Intent(context, OneNewsPost::class.java)
+            // val onePostIntent = Intent(context, OneNewsPost::class.java)
+            val onePostIntent = Intent(context, ReadNews::class.java)
 
             onePostIntent.putExtra("titleKey", newsPost.title.toString())
             onePostIntent.putExtra("descKey", newsPost.description.toString())
             onePostIntent.putExtra("imageKey", newsPost.imageURL)
             onePostIntent.putExtra("linkKey", newsPost.link)
             onePostIntent.putExtra("dateKey", newsPost.pubDate)
-            onePostIntent.putExtra("authorKey", newsPost.creator.toString())
+            onePostIntent.putExtra("authorKey", newsPost.author.toString())
+            context.startActivity(onePostIntent)
+        }
+
+        fun openSavedNewsPost(context: Context, newsPost: NewsMetaData) {
+            val onePostIntent = Intent(context, ReadNews::class.java)
+
+            onePostIntent.putExtra("titleKey", newsPost.title.toString())
+            onePostIntent.putExtra("descKey", newsPost.description.toString())
+            onePostIntent.putExtra("imageKey", newsPost.imageURL)
+            onePostIntent.putExtra("linkKey", newsPost.link)
+            onePostIntent.putExtra("dateKey", newsPost.pubDate)
             context.startActivity(onePostIntent)
         }
     }

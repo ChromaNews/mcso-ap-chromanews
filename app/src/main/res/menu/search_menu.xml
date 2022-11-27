@@ -1,19 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
     <item
-        android:id="@+id/navigation_categories"
-        android:icon="@drawable/baseline_menu_24"
-        android:title="Categories" />
-
-    <item
-        android:id="@+id/navigation_newsfeed"
-        android:icon="@drawable/baseline_feed_24"
-        android:title="Newsfeed" />
-
-    <item
-        android:id="@+id/navigation_bookmark"
-        android:icon="@drawable/baseline_bookmark_24"
-        android:title="Bookmark" />
+        android:id="@+id/action_search"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="always"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:title="Search"/>
 
 </menu>
