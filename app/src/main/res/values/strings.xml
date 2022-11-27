@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Chroma News</string>
     <string name="google_maps_key">AIzaSyCASxEVHh-4ffvJkWqvdNbooB31hawxW2Q</string>
+    <string name="acled_link">Source: <a href="acleddata.com">Armed Conflict Location and Event Data Project(ACLED)</a></string>
 </resources>

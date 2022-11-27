@@ -2,9 +2,13 @@ package com.mcso.ap.chromanews.ui.conflict
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.net.Uri
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -81,11 +85,18 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-
         conflictDetailsBinding.closeButton.setOnClickListener {
-            conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
+            conflictDetailsBinding.conflictDetails.visibility = View.GONE
         }
-        conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
+        conflictDetailsBinding.conflictDetails.visibility = View.GONE
+
+        /*binding.acledAttribution.movementMethod = LinkMovementMethod()
+        binding.acledAttribution.linksClickable = true*/
+
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.acleddata.com/"))
+        binding.acledAttribution.setOnClickListener {
+            startActivity(browserIntent)
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -107,7 +118,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getConflictLocations(){
-
         conflictsMap.uiSettings.isZoomControlsEnabled = true
         conflictsMap.setOnMarkerClickListener {
             showData(it)
@@ -115,8 +125,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         conflictsMap.setOnMapClickListener {
 
             // hide layout
-            conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
-
+            //conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
+            conflictDetailsBinding.conflictDetails.visibility = View.GONE
 
             val markerLocation = it
             val markerLat = markerLocation.latitude
@@ -139,7 +149,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                         conflictsList.forEach { conflict ->
                             run {
                                 Log.d(TAG,
-                                    "Conflict location: ${conflict.location} (${conflict.latitude}, ${conflict.longitude})")
+                                    "Conflict location: ${conflict.location} " +
+                                            "(${conflict.latitude}, ${conflict.longitude})")
 
                                 val conflictLatLng = LatLng(conflict.latitude.toDouble(), conflict.longitude.toDouble())
                                 val markerOption = MarkerOptions().position(conflictLatLng)
@@ -151,7 +162,11 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                         }
 
                         if (conflictsList.size > 0){
-                            conflictsMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 150))
+                            conflictsMap.animateCamera(
+                                CameraUpdateFactory.newLatLngBounds(
+                                    latLngBounds.build(), 150
+                                )
+                            )
                         } else {
                             conflictsMap.clear()
                             Toast.makeText(requireContext(), "Peace!", Toast.LENGTH_SHORT).show()
@@ -172,9 +187,9 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         val conflictInfo : Conflicts? = viewModel.getConflictForLocation(marker.title.toString())
 
         if (conflictInfo != null){
-            conflictDetailsBinding.root.visibility = View.VISIBLE
-            conflictDetailsBinding.scrollableConflictDetails.visibility = View.VISIBLE
-
+            //conflictDetailsBinding.scrollableConflictDetails.visibility = View.VISIBLE
+            conflictDetailsBinding.conflictDetails.visibility = View.VISIBLE
+            conflictDetailsBinding.sources.text = conflictInfo.source
             setNotes(conflictInfo.notes)
             setActors(conflictInfo.actor_one, conflictInfo.actor_two)
 
@@ -225,7 +240,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             } else {
                 Log.i(javaClass.simpleName,
                     "This device must install Google Play Services.")
-                // TODO - finish()
+                onDestroy()
             }
         }
     }
