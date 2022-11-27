@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -17,9 +16,13 @@ import com.mcso.ap.chromanews.databinding.ActionBarBinding
 import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 import java.util.*
 import kotlin.collections.ArrayList
+import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.ui.ViewPagerAdapter
+import com.mcso.ap.chromanews.ui.bookmark.BookmarkFragment
+import com.mcso.ap.chromanews.ui.newsfeed.*
+import com.mcso.ap.chromanews.ui.conflict.ConflictMapFragment
+import com.mcso.ap.chromanews.ui.sentiment.MoodColorFragment
 
-
-// class MainActivity : AppCompatActivity() {
 class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStrategy
 {
 
@@ -35,7 +38,6 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
     companion object {
         private val TAG = "MainActivity"
         private const val mainFragTag = "mainFragTag"
-        // private val category = "entertainment"
     }
 
     // call back once log signInIntent is completed in AuthInit()
@@ -62,25 +64,6 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
-        // test firestore
-        // viewModel.calculateRating()
-
-        // viewModel.observeRatingByDate().observe(this){
-        //    viewModel.calculateSentimentColorCode(it)
-        // }
-
-        /*
-        tabLayout = findViewById(R.id.tab_layout)
-        simpleFrameLayout =  findViewById(R.id.simpleFrameLayout)
-        viewpager = findViewById(R.id.view_pager)
-        tabLayout.tabGravity = TabLayout.GRAVITY_FILL
-        val adapter = ViewPagerAdapter(this, supportFragmentManager,
-            tabLayout.tabCount)
-        viewpager.adapter = adapter
-        // tabLayout.setupWithViewPager(viewpager)
-         */
-
-
         viewPager2 = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
 
@@ -92,6 +75,8 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         titles.add("Sports")
         titles.add("Technology")
         titles.add("Bookmarks")
+        titles.add("Sentiment")
+        titles.add("Conflicts")
 
         val viewPager2Adapter = ViewPagerAdapter(this)
         val fragmentList: ArrayList<Fragment> = ArrayList() //creates an ArrayList of Fragments
@@ -104,6 +89,8 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         fragmentList.add(SportsFragment())
         fragmentList.add(TechnologyFragment())
         fragmentList.add(BookmarkFragment())
+        fragmentList.add(ConflictMapFragment())
+        fragmentList.add(MoodColorFragment())
         viewPager2Adapter.setData(fragmentList) //sets the data for the adapter
 
         viewPager2.adapter = viewPager2Adapter

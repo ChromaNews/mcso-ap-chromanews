@@ -22,7 +22,7 @@ interface NewsDataApi {
     //2efd2e82e029486e8594bb91c7e01c92
     // old: 4fce6873f43b44d194825e906d825aa0
     // new: 2efd2e82e029486e8594bb91c7e01c92
-    @GET("v2/top-headlines?language=en&apiKey=4fce6873f43b44d194825e906d825aa0&pageSize=100")
+    @GET("v2/top-headlines?language=en&apiKey=2efd2e82e029486e8594bb91c7e01c92&pageSize=100")
     suspend fun getNews(@Query("category") category: String) : NewsDataResponse
 
     data class NewsDataResponse(

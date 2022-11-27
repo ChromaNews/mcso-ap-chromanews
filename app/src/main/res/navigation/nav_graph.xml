@@ -7,16 +7,16 @@
 
     <fragment
         android:id="@+id/navigation_categories"
-        android:name="com.mcso.ap.chromanews.CategoryFragment"
+        android:name="com.mcso.ap.chromanews.ui.category.CategoryFragment"
         tools:layout="@layout/fragment_rv"/>
 
     <fragment
         android:id="@+id/navigation_newsfeed"
-        android:name="com.mcso.ap.chromanews.NewsFeedFragment"
+        android:name="com.mcso.ap.chromanews.ui.newsfeed.NewsFeedFragment"
         tools:layout="@layout/fragment_rv" />
 
     <fragment
         android:id="@+id/navigation_bookmark"
-        android:name="com.mcso.ap.chromanews.BookmarkFragment"
+        android:name="com.mcso.ap.chromanews.ui.bookmark.BookmarkFragment"
         tools:layout="@layout/fragment_rv" />
 </navigation>

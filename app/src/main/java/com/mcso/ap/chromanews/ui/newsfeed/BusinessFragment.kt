@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.os.Bundle
 import android.util.Log
@@ -7,7 +7,9 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.R
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
+import com.mcso.ap.chromanews.model.MainViewModel
 
 
 class BusinessFragment: Fragment() {

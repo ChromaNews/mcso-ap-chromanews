@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.bookmark
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +9,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mcso.ap.chromanews.databinding.SavedNewsBinding
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
+import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.Glide
+import com.mcso.ap.chromanews.databinding.FragmentRvBinding
+
 
 class BookmarkAdapter(private val viewModel: MainViewModel)
     : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(RedditDiff()) {

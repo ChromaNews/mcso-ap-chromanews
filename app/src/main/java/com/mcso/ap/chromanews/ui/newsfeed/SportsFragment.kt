@@ -1,19 +1,19 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.R
 
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
-import kotlin.math.abs
+import com.mcso.ap.chromanews.model.MainViewModel
 
 
-class GeneralFragment: Fragment() {
+class SportsFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
 
@@ -21,9 +21,9 @@ class GeneralFragment: Fragment() {
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance(): GeneralFragment {
+        fun newInstance(): SportsFragment {
             Log.d("ANBU: ", "instance")
-            return GeneralFragment()
+            return SportsFragment()
         }
     }
 
@@ -36,7 +36,6 @@ class GeneralFragment: Fragment() {
         _binding = FragmentRvBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,12 +82,10 @@ class GeneralFragment: Fragment() {
 
         viewModel.observeCategory().observe(viewLifecycleOwner){
             viewModel.netPosts()
-            // adapter.notifyDataSetChanged()
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener{
             viewModel.netPosts()
-            // adapter.notifyDataSetChanged()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
@@ -111,11 +108,6 @@ class GeneralFragment: Fragment() {
             }
         }
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("ANBU: ", "Inside ONRESUME" )
     }
 
     override fun onDestroyView() {

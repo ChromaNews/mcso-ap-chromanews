@@ -1,19 +1,19 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.R
 
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
-import kotlin.math.abs
+import com.mcso.ap.chromanews.model.MainViewModel
 
 
-class ScienceFragment: Fragment() {
+class TechnologyFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
 
@@ -21,9 +21,9 @@ class ScienceFragment: Fragment() {
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance(): ScienceFragment {
+        fun newInstance(): TechnologyFragment {
             Log.d("ANBU: ", "instance")
-            return ScienceFragment()
+            return TechnologyFragment()
         }
     }
 

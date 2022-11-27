@@ -1,30 +1,29 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.R
 
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
-import kotlin.math.abs
+import com.mcso.ap.chromanews.model.MainViewModel
 
 
-class HealthFragment: Fragment() {
+class ScienceFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
-    private var default_category = mutableListOf<String>("business")
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance(): HealthFragment {
+        fun newInstance(): ScienceFragment {
             Log.d("ANBU: ", "instance")
-            return HealthFragment()
+            return ScienceFragment()
         }
     }
 
@@ -75,9 +74,10 @@ class HealthFragment: Fragment() {
 
         viewModel.observeLiveData().observe(viewLifecycleOwner){
             Log.d("ANBU: ", "ObserveLiveData")
-            adapter.submitList(it){
-                binding.recyclerRVView.scrollToPosition(0)
-            }
+            // adapter.submitList(it){
+            //     binding.recyclerRVView.scrollToPosition(0)
+            // }
+            adapter.submitList(it)
             adapter.notifyDataSetChanged()
         }
 

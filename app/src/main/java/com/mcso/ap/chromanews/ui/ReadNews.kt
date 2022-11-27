@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui
 
 
 import android.annotation.SuppressLint
@@ -11,6 +11,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import com.mcso.ap.chromanews.R
 
 
 class ReadNews : AppCompatActivity() {

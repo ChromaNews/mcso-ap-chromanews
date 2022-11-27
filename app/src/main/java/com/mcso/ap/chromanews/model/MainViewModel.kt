@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.model
 
 import android.content.Context
 import android.content.Intent
@@ -13,13 +13,14 @@ import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
 import com.mcso.ap.chromanews.model.api.SentimentData
 import com.mcso.ap.chromanews.model.auth.FirebaseUserLiveData
+import com.mcso.ap.chromanews.model.conflict.Conflicts
+import com.mcso.ap.chromanews.model.conflict.ConflictsResponse
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.math.abs
-import kotlin.random.Random
 import com.mcso.ap.chromanews.db.NewsDBHelper
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
+import com.mcso.ap.chromanews.ui.ReadNews
 
 class MainViewModel(): ViewModel() {
 
@@ -43,6 +44,12 @@ class MainViewModel(): ViewModel() {
 
     // sentiment color rating data
     private val ratingDateList = MutableLiveData<List<Double>>()
+
+    // conflicts api and data
+    private val api: ConflictsApi = ConflictsApi.create()
+    private val repo = ConflictRepo(api)
+    private var conflictLiveData = MutableLiveData<ConflictsResponse>()
+    private var showProgress = MutableLiveData<Boolean>()
 
     // newsdata
     private val newsDataList = MediatorLiveData<List<NewsPost>>().apply {
@@ -340,7 +347,6 @@ class MainViewModel(): ViewModel() {
     /**
      * BEGIN RATING SECTION
      */
-
     fun netAnalyzeNews(newsText: String){
         viewModelScope.launch (
             context = viewModelScope.coroutineContext
@@ -359,46 +365,46 @@ class MainViewModel(): ViewModel() {
         firebaseAuthLiveData.getUser()?.let { sentimentDataDB.createSentimentRating(it, score) }
     }
 
+    // Color
     fun observeRatingByDate(): LiveData<List<Double>> {
         return ratingDateList
     }
-
-    fun calculateSentimentColorCode(ratingByDate: List<Double>){
-        Log.d(TAG, "total rating: ${ratingByDate.sum() / ratingByDate.size}")
-
-        when (val sentimentValue = (ratingByDate.sum() / ratingByDate.size)){
-            0.0 -> {
-                Log.d(TAG, "Neutral Sentiment value = $sentimentValue")
-                sentimentColor = SentimentColor(0, 255, 0)
-            }
-            in 0.00..1.0 -> {
-                Log.d(TAG, "Positive Sentiment value = $sentimentValue")
-                calculatePositiveColor(sentimentValue)
-            }
-            in -1.0..-0.01 -> {
-                Log.d(TAG, "Negative Sentiment value = $sentimentValue")
-                calculateNegativeColor(sentimentValue)
-            }
-        }
-        Log.d(TAG, "mood color: [${sentimentColor.red}, ${sentimentColor.green}, ${sentimentColor.blue}]")
-    }
-
-    private fun calculateNegativeColor(sentimentNum: Double){
-        val red = (abs(sentimentNum) * 255).toInt()
-        val green = abs((1 + sentimentNum) * 255).toInt()
-        sentimentColor = SentimentColor(red, green, 0)
-    }
-
-    private fun calculatePositiveColor(sentimentNum: Double){
-        val blue = (abs(sentimentNum) * 255).toInt()
-        val green = abs((1 - sentimentNum) * 255).toInt()
-        sentimentColor = SentimentColor(0, green, blue)
-    }
-
 
     fun calculateRating(){
         firebaseAuthLiveData.getUser()?.let {
             sentimentDataDB.getTotalRating(it, ratingDateList)
         }!!
+    }
+
+    // conflicts
+    fun netConflict(country: String) {
+        viewModelScope.launch(
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO){
+            showProgress.postValue(true)
+            conflictLiveData.postValue(repo.getConflictData(country))
+            showProgress.postValue(false)
+        }
+    }
+
+    fun observeConflictData(): LiveData<ConflictsResponse> {
+        return conflictLiveData
+    }
+
+    fun getConflictForLocation(markerLocation: String): Conflicts? {
+        var conflictInfo: Conflicts? = null
+        val conflicts: List<Conflicts>? = conflictLiveData.value?.conflictList?.filter {
+            conflicts -> conflicts.location == markerLocation
+        }
+
+        if (conflicts != null && conflicts.isNotEmpty()) {
+            conflictInfo = conflicts[0]
+        }
+
+        return conflictInfo
+    }
+
+    fun observeShowProgress(): LiveData<Boolean> {
+        return showProgress
     }
 }

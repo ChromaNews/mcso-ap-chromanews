@@ -1,10 +1,9 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
-
 
 class ViewPagerAdapter(fragmentActivity: FragmentActivity?) :
     FragmentStateAdapter(fragmentActivity!!) {

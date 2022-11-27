@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.os.Bundle
 import android.util.Log
@@ -7,21 +7,24 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.R
 
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
+import com.mcso.ap.chromanews.model.MainViewModel
 
 
-class EntertainmentFragment: Fragment() {
+class HealthFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
+    private var default_category = mutableListOf<String>("business")
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance(): EntertainmentFragment {
+        fun newInstance(): HealthFragment {
             Log.d("ANBU: ", "instance")
-            return EntertainmentFragment()
+            return HealthFragment()
         }
     }
 
@@ -34,7 +37,6 @@ class EntertainmentFragment: Fragment() {
         _binding = FragmentRvBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,13 +73,6 @@ class EntertainmentFragment: Fragment() {
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
 
-        viewModel.observeCategory().observe(viewLifecycleOwner){
-       //     //if (viewModel.getCategories().value?.isEmpty() == false){
-            viewModel.netPosts()
-            //}
-            // adapter.notifyDataSetChanged()
-        }
-
         viewModel.observeLiveData().observe(viewLifecycleOwner){
             Log.d("ANBU: ", "ObserveLiveData")
             adapter.submitList(it){
@@ -86,9 +81,12 @@ class EntertainmentFragment: Fragment() {
             adapter.notifyDataSetChanged()
         }
 
+        viewModel.observeCategory().observe(viewLifecycleOwner){
+            viewModel.netPosts()
+        }
+
         binding.swipeRefreshLayout.setOnRefreshListener{
             viewModel.netPosts()
-            // adapter.notifyDataSetChanged()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
@@ -111,11 +109,6 @@ class EntertainmentFragment: Fragment() {
             }
         }
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("ANBU: ", "Inside ONRESUME" )
     }
 
     override fun onDestroyView() {

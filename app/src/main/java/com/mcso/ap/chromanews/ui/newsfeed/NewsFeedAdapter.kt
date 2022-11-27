@@ -1,4 +1,4 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.content.Intent
 import android.graphics.Color
@@ -9,6 +9,9 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.mcso.ap.chromanews.Glide
+import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.R
 import com.mcso.ap.chromanews.api.NewsPost
 import com.mcso.ap.chromanews.databinding.NewsPostBinding
 import java.util.*
@@ -126,7 +129,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         // binding.category.text = viewModel.getCategories().value.toString()
 
         if (item.imageURL != null){
-            Glide.glideFetch(item.imageURL, null , binding.image)
+            Glide.glideFetch(item.imageURL, null, binding.image)
         }
 
         if ( item.link.length > 60 ){

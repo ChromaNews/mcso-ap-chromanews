@@ -1,19 +1,19 @@
-package com.mcso.ap.chromanews
+package com.mcso.ap.chromanews.ui.newsfeed
 
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mcso.ap.chromanews.R
 
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
-import kotlin.math.abs
+import com.mcso.ap.chromanews.model.MainViewModel
 
 
-class SportsFragment: Fragment() {
+class EntertainmentFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
 
@@ -21,9 +21,9 @@ class SportsFragment: Fragment() {
     private val binding get() = _binding!!
 
     companion object {
-        fun newInstance(): SportsFragment {
+        fun newInstance(): EntertainmentFragment {
             Log.d("ANBU: ", "instance")
-            return SportsFragment()
+            return EntertainmentFragment()
         }
     }
 
@@ -73,6 +73,13 @@ class SportsFragment: Fragment() {
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
 
+        viewModel.observeCategory().observe(viewLifecycleOwner){
+       //     //if (viewModel.getCategories().value?.isEmpty() == false){
+            viewModel.netPosts()
+            //}
+            // adapter.notifyDataSetChanged()
+        }
+
         viewModel.observeLiveData().observe(viewLifecycleOwner){
             Log.d("ANBU: ", "ObserveLiveData")
             adapter.submitList(it){
@@ -81,12 +88,9 @@ class SportsFragment: Fragment() {
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.observeCategory().observe(viewLifecycleOwner){
-            viewModel.netPosts()
-        }
-
         binding.swipeRefreshLayout.setOnRefreshListener{
             viewModel.netPosts()
+            // adapter.notifyDataSetChanged()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
@@ -109,6 +113,11 @@ class SportsFragment: Fragment() {
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("ANBU: ", "Inside ONRESUME" )
     }
 
     override fun onDestroyView() {
