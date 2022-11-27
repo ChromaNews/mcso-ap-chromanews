@@ -9,6 +9,8 @@ import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
 import com.mcso.ap.chromanews.model.api.SentimentData
 import com.mcso.ap.chromanews.model.auth.FirebaseUserLiveData
+import com.mcso.ap.chromanews.model.conflict.Conflicts
+import com.mcso.ap.chromanews.model.conflict.ConflictsResponse
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,6 +37,12 @@ class MainViewModel(): ViewModel() {
 
     // sentiment color rating data
     private val ratingDateList = MutableLiveData<List<Double>>()
+
+    // conflicts api and data
+    private val api: ConflictsApi = ConflictsApi.create()
+    private val repo = ConflictRepo(api)
+    private var conflictLiveData = MutableLiveData<ConflictsResponse>()
+    private var showProgress = MutableLiveData<Boolean>()
 
     // newsdata
     private val newsDataList = MediatorLiveData<List<NewsPost>>().apply {
@@ -203,5 +211,37 @@ class MainViewModel(): ViewModel() {
         firebaseAuthLiveData.getUser()?.let {
             sentimentDataDB.getTotalRating(it, ratingDateList)
         }!!
+    }
+
+    // conflicts
+    fun netConflict(country: String) {
+        viewModelScope.launch(
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO){
+            showProgress.postValue(true)
+            conflictLiveData.postValue(repo.getConflictData(country))
+            showProgress.postValue(false)
+        }
+    }
+
+    fun observeConflictData(): LiveData<ConflictsResponse> {
+        return conflictLiveData
+    }
+
+    fun getConflictForLocation(markerLocation: String): Conflicts? {
+        var conflictInfo: Conflicts? = null
+        val conflicts: List<Conflicts>? = conflictLiveData.value?.conflictList?.filter {
+            conflicts -> conflicts.location == markerLocation
+        }
+
+        if (conflicts != null && conflicts.isNotEmpty()) {
+            conflictInfo = conflicts[0]
+        }
+
+        return conflictInfo
+    }
+
+    fun observeShowProgress(): LiveData<Boolean> {
+        return showProgress
     }
 }
