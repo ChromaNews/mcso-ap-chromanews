@@ -21,6 +21,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -41,6 +43,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         private val TAG = "ConflictMapFragment"
     }
 
+    private val acledLink: String = "https://www.acleddata.com"
     private var _binding: FragmentConflictMapBinding? = null
     private lateinit var conflictsMap: GoogleMap
     private lateinit var geocoder: Geocoder
@@ -50,6 +53,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private val conflictDetailsBinding get() = _conflictDetailsBinding
     private lateinit var _conflictDetailsBinding: ConflictDetailsBinding
+
+    private lateinit var locationService: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,17 +95,20 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         }
         conflictDetailsBinding.conflictDetails.visibility = View.GONE
 
-        /*binding.acledAttribution.movementMethod = LinkMovementMethod()
-        binding.acledAttribution.linksClickable = true*/
-
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.acleddata.com/"))
+        // launch browser ACLED data
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(acledLink))
         binding.acledAttribution.setOnClickListener {
             startActivity(browserIntent)
         }
+
+        locationService = activity?.let { LocationServices.getFusedLocationProviderClient(it) }!!
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         conflictsMap = googleMap
+
+
 
         if (locationPermissionGranted){
             val permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -113,7 +121,18 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
 
+            conflictsMap.isMyLocationEnabled = true
+
             getConflictLocations()
+            val locationResult = locationService.lastLocation
+
+            locationResult.addOnSuccessListener { location ->
+                run {
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    val update = CameraUpdateFactory.newLatLngZoom(latLng, 5.0F);
+                    conflictsMap.moveCamera(update);
+                }
+            }
         }
     }
 
@@ -125,7 +144,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         conflictsMap.setOnMapClickListener {
 
             // hide layout
-            //conflictDetailsBinding.scrollableConflictDetails.visibility = View.GONE
             conflictDetailsBinding.conflictDetails.visibility = View.GONE
 
             val markerLocation = it
@@ -187,7 +205,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         val conflictInfo : Conflicts? = viewModel.getConflictForLocation(marker.title.toString())
 
         if (conflictInfo != null){
-            //conflictDetailsBinding.scrollableConflictDetails.visibility = View.VISIBLE
             conflictDetailsBinding.conflictDetails.visibility = View.VISIBLE
             conflictDetailsBinding.sources.text = conflictInfo.source
             setNotes(conflictInfo.notes)
@@ -220,10 +237,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         }
 
         conflictDetailsBinding.actors.text = actorsText
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onDestroy() {
@@ -261,6 +274,4 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         }
         locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
     }
-
-
 }
