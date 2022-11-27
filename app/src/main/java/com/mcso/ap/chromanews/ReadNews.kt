@@ -19,7 +19,7 @@ class OneNewsPost : AppCompatActivity() {
         // Get a support ActionBar corresponding to this toolbar and enable the Up button
         // setSupportActionBar(activityOnePostBinding.toolbar)
 
-        activityOnePostBinding.toolbar.title = "One Post"
+        activityOnePostBinding.toolbar.title = "Read News"
         // supportActionBar?.setDisplayShowTitleEnabled(true)
         // supportActionBar?.setDisplayShowTitleEnabled(false)
         // supportActionBar?.setDisplayShowCustomEnabled(false)
