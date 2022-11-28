@@ -63,7 +63,7 @@ class MoodColorFragment : Fragment() {
     override fun setMenuVisibility(menuVisible: Boolean) {
         super.setMenuVisibility(menuVisible)
         if (view != null && menuVisible){
-            viewModel.calculateRating()
+          //  viewModel.calculateRating()
         }
     }
 
