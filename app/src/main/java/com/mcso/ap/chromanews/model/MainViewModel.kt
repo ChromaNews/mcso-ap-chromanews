@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.*
-import com.mcso.ap.chromanews.ui.OneNewsPost
 import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
 import com.mcso.ap.chromanews.model.api.SentimentData
@@ -14,6 +13,9 @@ import com.mcso.ap.chromanews.model.conflict.ConflictsResponse
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.mcso.ap.chromanews.db.NewsDBHelper
+import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
+import com.mcso.ap.chromanews.ui.ReadNews
 
 class MainViewModel(): ViewModel() {
 
@@ -23,6 +25,7 @@ class MainViewModel(): ViewModel() {
     private val firebaseAuthLiveData = FirebaseUserLiveData()
 
     // NewsData repo and api
+    private var category = "business"
     private val newsDataApi = NewsDataApi.create()
     private val newsDataRepo = NewsDataRepo(newsDataApi)
 
@@ -33,7 +36,6 @@ class MainViewModel(): ViewModel() {
 
     // Sentiment data DB
     private val sentimentDataDB: SentimentDBHelper = SentimentDBHelper()
-    private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
 
     // sentiment color rating data
     private val ratingDateList = MutableLiveData<List<Double>>()
@@ -44,17 +46,75 @@ class MainViewModel(): ViewModel() {
     private var conflictLiveData = MutableLiveData<ConflictsResponse>()
     private var showProgress = MutableLiveData<Boolean>()
 
-    // newsdata
-    private val newsDataList = MediatorLiveData<List<NewsPost>>().apply {
-        value = mutableListOf()
+    // for bookmarked news
+    private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
+    private var savedNewsList = MutableLiveData<List<NewsMetaData>>()
+
+    fun getFeedForCategory(){
+        viewModelScope.launch (
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO)
+        {
+            Log.d(TAG, "fetching news feed for [${category}]")
+            fetchList.postValue(newsDataRepo.getNews(category))
+            fetchDone.postValue(true)
+        }
     }
 
-    private var category = MutableLiveData<List<String>>().apply{
-        value = mutableListOf("top")
+    fun setCategory(tabCategory: String){
+        category = tabCategory
     }
 
-    private var default_category = MutableLiveData<List<String>>().apply{
-        value = mutableListOf("top", "health", "business", "science")
+    fun fetchSavedNewsList() {
+        savednewsDataDB.fetchSavedNews(savedNewsList)
+    }
+
+    fun observeSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
+        return savedNewsList
+    }
+
+    fun getSavedNewsCount(): Int? {
+        return savedNewsList.value?.size
+    }
+
+    fun getNewsMeta(position: Int) : NewsMetaData {
+        val news = savedNewsList.value?.get(position)
+        return news!!
+    }
+
+    fun createNewsMetadata(uuid: String, title: String, pubDate: String, description: String,
+                           imageURL: String, link: String){
+
+        val newsMeta = NewsMetaData(
+            newsID = uuid,
+            title = title,
+            description = description,
+            imageURL = imageURL,
+            link = link,
+            pubDate = pubDate,
+            firestoreID = ""
+        )
+        savednewsDataDB.createNewsMetadata(newsMeta, savedNewsList)
+    }
+
+    fun getSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
+        return savedNewsList
+    }
+
+    fun removeSavedNews(position: Int){
+        val news = getNewsMeta(position)
+        var newsPost: NewsPost? = null
+
+        for (item in favPostsList.value!!){
+            if (item.title == news.title){
+                newsPost = item
+                break
+            }
+        }
+        savednewsDataDB.removeNewsMetadata(news, savedNewsList)
+        if (newsPost != null) {
+            removeFav(newsPost)
+        }
     }
 
     // update firebase user
@@ -62,18 +122,10 @@ class MainViewModel(): ViewModel() {
         firebaseAuthLiveData.updateUser()
     }
 
-    private var title = MutableLiveData<String>()
     private var searchTerm: MutableLiveData<String> = MutableLiveData("")
     var fetchDone : MutableLiveData<Boolean> = MutableLiveData(false)
-    var subreddit = MutableLiveData<String>().apply {
-        value = "entertainment"
-    }
 
     var fetchList = MediatorLiveData<List<NewsPost>>().apply {
-        value = mutableListOf()
-    }
-
-    var subredditList = MediatorLiveData<List<NewsPost>>().apply {
         value = mutableListOf()
     }
 
@@ -82,44 +134,17 @@ class MainViewModel(): ViewModel() {
         value = mutableListOf()
     }
 
+    // setting search term
+    fun setSearchTerm(s: String) {
+        searchTerm.value = s
+    }
+
     init{
-        // netPosts()
-    }
-
-    fun netPosts(){
-        viewModelScope.launch (
-            context = viewModelScope.coroutineContext
-                    + Dispatchers.IO)
-        {
-            Log.d("ANBU: ", fetchList.value.toString())
-            fetchList.postValue(category.value?.let { newsDataRepo.getNews(it.joinToString(','.toString())) })
-            fetchDone.postValue(true)
-        }
-    }
-
-    fun observeCategory(): MutableLiveData<List<String>> {
-        return category
-    }
-
-    fun setCategory(newCategory: MutableList<String>){
-        category.value = emptyList()
-        category.value = newCategory
-    }
-
-    fun setDefaultCategory(){
-        category.value = default_category.value
+        fetchSavedNewsList()
     }
 
     fun observeLiveData(): LiveData<List<NewsPost>> {
         return fetchList
-    }
-
-    fun getCategories(): MutableLiveData<List<String>> {
-        return category
-    }
-
-    fun observeLiveFavoritesData(): LiveData<List<NewsPost>> {
-        return favPostsList
     }
 
     fun removeFav(albumRec: NewsPost) {
@@ -128,18 +153,14 @@ class MainViewModel(): ViewModel() {
             it.remove(albumRec)
             favPostsList.value = it
         }
-        Log.d("ANBU removeFav:", favPostsList.value?.size.toString())
-        Log.d("ANBU removeFav List:", favPostsList.value.toString())
     }
 
 
     fun isFav(albumRec: NewsPost): Boolean {
         var fav =  favPostsList.value?.contains(albumRec) ?: false
-
-        Log.d("ANBU: isFav : ", albumRec.toString())
-        Log.d("ANBU: isFav exists: ", fav.toString())
         return fav
     }
+
 
     fun getItemAt(position: Int) : NewsPost? {
         val localList = fetchList.value?.toList()
@@ -151,8 +172,6 @@ class MainViewModel(): ViewModel() {
     }
 
     fun addFav(albumRec: NewsPost) {
-        // favPosts.add(albumRec)
-        // favPostsList.value = favPosts
         val localList = favPostsList.value?.toMutableList()
         localList?.let {
             it.add(albumRec)
@@ -161,22 +180,29 @@ class MainViewModel(): ViewModel() {
         Log.d("ANBU addFav ", favPostsList.value.toString())
     }
 
-    fun getFavoriteCount() : Int {
-        return favPostsList.value!!.size
-    }
-
-
     // Convenient place to put it as it is shared
     companion object {
         fun doOnePost(context: Context, newsPost: NewsPost) {
-            val onePostIntent = Intent(context, OneNewsPost::class.java)
+            // val onePostIntent = Intent(context, OneNewsPost::class.java)
+            val onePostIntent = Intent(context, ReadNews::class.java)
 
             onePostIntent.putExtra("titleKey", newsPost.title.toString())
             onePostIntent.putExtra("descKey", newsPost.description.toString())
             onePostIntent.putExtra("imageKey", newsPost.imageURL)
             onePostIntent.putExtra("linkKey", newsPost.link)
             onePostIntent.putExtra("dateKey", newsPost.pubDate)
-            onePostIntent.putExtra("authorKey", newsPost.creator.toString())
+            onePostIntent.putExtra("authorKey", newsPost.author.toString())
+            context.startActivity(onePostIntent)
+        }
+
+        fun openSavedNewsPost(context: Context, newsPost: NewsMetaData) {
+            val onePostIntent = Intent(context, ReadNews::class.java)
+
+            onePostIntent.putExtra("titleKey", newsPost.title.toString())
+            onePostIntent.putExtra("descKey", newsPost.description.toString())
+            onePostIntent.putExtra("imageKey", newsPost.imageURL)
+            onePostIntent.putExtra("linkKey", newsPost.link)
+            onePostIntent.putExtra("dateKey", newsPost.pubDate)
             context.startActivity(onePostIntent)
         }
     }

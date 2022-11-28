@@ -29,8 +29,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-        <!--Kind of a weird construction. The FrameLayout acts like -->
-        <!-- a "union" that can contain either an ImageView or TextView-->
 
         <TextView
             android:id="@+id/category"

@@ -108,8 +108,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         conflictsMap = googleMap
 
-
-
         if (locationPermissionGranted){
             val permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -128,9 +126,11 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
             locationResult.addOnSuccessListener { location ->
                 run {
-                    val latLng = LatLng(location.latitude, location.longitude)
-                    val update = CameraUpdateFactory.newLatLngZoom(latLng, 5.0F);
-                    conflictsMap.moveCamera(update);
+                    if (location != null){
+                        val latLng = LatLng(location.latitude, location.longitude)
+                        val update = CameraUpdateFactory.newLatLngZoom(latLng, 5.0F);
+                        conflictsMap.moveCamera(update);
+                    }
                 }
             }
         }

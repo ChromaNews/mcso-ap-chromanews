@@ -1,48 +1,34 @@
 package com.mcso.ap.chromanews.ui
 
-import android.content.Context
-import androidx.fragment.app.*
 import androidx.fragment.app.Fragment
-import com.mcso.ap.chromanews.ui.bookmark.BookmarkFragment
-import com.mcso.ap.chromanews.ui.category.CategoryFragment
-import com.mcso.ap.chromanews.ui.conflict.ConflictMapFragment
-import com.mcso.ap.chromanews.ui.newsfeed.NewsFeedFragment
-import com.mcso.ap.chromanews.ui.sentiment.MoodColorFragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager2.adapter.FragmentStateAdapter
 
-@Suppress("DEPRECATION")
-internal class ViewPagerAdapter(
-    var context: Context,
-    fm: FragmentManager,
-    var totalTabs: Int
-) :
-    FragmentPagerAdapter(fm) {
-    val categoryFragment: String = "CategoryFragment"
-    val newsFeedFragment: String = "NewsFeedFragment"
-    val bookmarkFragment: String = "BookmarkFragment"
-    val emptyFragment: String = "EmptyFragment"
+class ViewPagerAdapter(fragmentActivity: FragmentActivity?) :
+    FragmentStateAdapter(fragmentActivity!!) {
 
-    override fun getItem(position: Int): Fragment {
-        return when (position) {
-            0 -> {
-                CategoryFragment()
-            }
-            1 -> {
-                NewsFeedFragment()
-            }
-            2 -> {
-                BookmarkFragment()
-            }
-            3 -> {
-                MoodColorFragment()
-            }
-            4 -> {
-                ConflictMapFragment()
-            }
-            else -> CategoryFragment()
-        }
+    private var fragments //variable holds the fragments the ViewPager2 allows us to swipe to.
+            : ArrayList<Fragment>? = null
+
+    override fun createFragment(position: Int): Fragment {
+        return fragments!![position]
     }
 
-    override fun getCount(): Int {
-        return totalTabs
+    override fun getItemCount(): Int {
+        return fragments!!.size
+    }
+
+    fun setData(fragments: ArrayList<Fragment>?) {
+        this.fragments = fragments
+    }
+
+    fun getPageTitle(position: Int): Fragment? {
+        // return fragments?.get(position)?.arguments?.getString("title")
+        return fragments?.get(position)
+    }
+
+    fun getItemPosition(`object`: Any?): Int {
+        return PagerAdapter.POSITION_NONE
     }
 }

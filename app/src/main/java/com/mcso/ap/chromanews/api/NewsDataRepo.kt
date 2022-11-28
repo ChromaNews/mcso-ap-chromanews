@@ -8,16 +8,9 @@ class NewsDataRepo(private val api: NewsDataApi) {
 
         val mutableList : MutableList<NewsPost> = arrayListOf()
 
-        Log.d("ANBU: result", response.totalResults.toString())
-        Log.d("ANBU: result", response.results.toString())
-
-        for (element in response.results) {
-                Log.d("ANBU: FOR result", element.toString())
-                mutableList.add(element)
+        for (element in response.articles) {
+            mutableList.add(element)
         }
-
-        Log.d("ANBU: mutableList",  mutableList.toList().toString() )
-
         return mutableList.toList()
     }
 
