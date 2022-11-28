@@ -46,16 +46,9 @@ class MainViewModel(): ViewModel() {
     private var conflictLiveData = MutableLiveData<ConflictsResponse>()
     private var showProgress = MutableLiveData<Boolean>()
 
-    // newsdata
-
-
     // for bookmarked news
     private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
     private var savedNewsList = MutableLiveData<List<NewsMetaData>>()
-
-    init{
-        getFeedForCategory()
-    }
 
     fun getFeedForCategory(){
         viewModelScope.launch (

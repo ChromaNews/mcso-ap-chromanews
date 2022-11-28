@@ -17,6 +17,7 @@ import com.mcso.ap.chromanews.databinding.ActivityMainBinding
 import java.util.*
 import kotlin.collections.ArrayList
 import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.model.Tabs
 import com.mcso.ap.chromanews.ui.ViewPagerAdapter
 import com.mcso.ap.chromanews.ui.bookmark.BookmarkFragment
 import com.mcso.ap.chromanews.ui.newsfeed.*
@@ -62,31 +63,16 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         AuthInit(viewModel,signInLauncher)
 
         viewPager2 = findViewById(R.id.view_pager)
-        viewPager2.offscreenPageLimit = 1
         tabLayout = findViewById(R.id.tab_layout)
-
-        titles.add("Business")
-        titles.add("Entertainment")
-        titles.add("Health")
-        titles.add("Science")
-        titles.add("Sports")
-        titles.add("Technology")
-        titles.add("Bookmarks")
-        titles.add("Sentiment")
-        titles.add("Conflicts")
-
         val viewPager2Adapter = ViewPagerAdapter(this)
         val fragmentList: ArrayList<Fragment> = ArrayList() //creates an ArrayList of Fragments
 
-        fragmentList.add(BusinessFragment())
-        fragmentList.add(EntertainmentFragment())
-        fragmentList.add(HealthFragment())
-        fragmentList.add(ScienceFragment())
-        fragmentList.add(SportsFragment())
-        fragmentList.add(TechnologyFragment())
-        fragmentList.add(BookmarkFragment())
-        fragmentList.add(MoodColorFragment())
-        fragmentList.add(ConflictMapFragment())
+        Tabs.values().forEach { tabs ->
+            run {
+                titles.add(tabs.getTitle())
+                fragmentList.add(tabs.getFragment())
+            }
+        }
         viewPager2Adapter.setData(fragmentList) //sets the data for the adapter
 
         viewPager2.adapter = viewPager2Adapter
@@ -95,13 +81,18 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 Log.d(TAG, "selected ${tab.text} at position ${tab.position}")
-                var selectedTab = tab.text.toString().lowercase(Locale.ROOT)
+                var selectedTab = tab.text.toString()
 
                 viewModel.setCategory(selectedTab)
-                viewModel.getFeedForCategory()
 
-                if (selectedTab == "bookmarks"){
-                    viewModel.fetchSavedNewsList()
+                if (Tabs.SENTIMENT.getTitle() != selectedTab
+                    && Tabs.CONFLICTS.getTitle() != selectedTab){
+
+                    if (Tabs.BOOKMARK.getTitle() == selectedTab){
+                        viewModel.fetchSavedNewsList()
+                    } else {
+                        viewModel.getFeedForCategory()
+                    }
                 }
             }
            override fun onTabUnselected(tab: TabLayout.Tab) {}
