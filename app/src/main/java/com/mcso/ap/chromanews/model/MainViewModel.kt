@@ -30,6 +30,7 @@ class MainViewModel(): ViewModel() {
     private val firebaseAuthLiveData = FirebaseUserLiveData()
 
     // NewsData repo and api
+    private var category = "business"
     private val newsDataApi = NewsDataApi.create()
     private val newsDataRepo = NewsDataRepo(newsDataApi)
 
@@ -40,7 +41,6 @@ class MainViewModel(): ViewModel() {
 
     // Sentiment data DB
     private val sentimentDataDB: SentimentDBHelper = SentimentDBHelper()
-    private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
 
     // sentiment color rating data
     private val ratingDateList = MutableLiveData<List<Double>>()
@@ -63,11 +63,25 @@ class MainViewModel(): ViewModel() {
     // for bookmarked news
     private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
     private var savedNewsList = MutableLiveData<List<NewsMetaData>>()
-    // private var filterbookmarkedList = MutableLiveData<List<NewsMetaData>>()
+
+
+    fun getFeedForCategory(){
+        viewModelScope.launch (
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO)
+        {
+            Log.d(TAG, "fetching news feed for [${category}]")
+            fetchList.postValue(newsDataRepo.getNews(category))
+            fetchDone.postValue(true)
+        }
+    }
+
+    fun setCategory(tabCategory: String){
+        category = tabCategory
+    }
 
     fun fetchSavedNewsList() {
         savednewsDataDB.fetchSavedNews(savedNewsList)
-        // filterbookmarkedList = savedNewsList
     }
 
     fun observeSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
@@ -77,14 +91,6 @@ class MainViewModel(): ViewModel() {
     fun getSavedNewsCount(): Int? {
         return savedNewsList.value?.size
     }
-
-    private var category = MutableLiveData<String>().apply{
-        value = "business"
-    }
-
-    // fun setBookmarkList(bookMlist: List<NewsMetaData>){
-    //    filterbookmarkedList.postValue(bookMlist)
-    // }
 
     fun getNewsMeta(position: Int) : NewsMetaData {
         val news = savedNewsList.value?.get(position)
@@ -154,32 +160,8 @@ class MainViewModel(): ViewModel() {
         fetchSavedNewsList()
     }
 
-    fun netPosts(){
-        viewModelScope.launch (
-            context = viewModelScope.coroutineContext
-                    + Dispatchers.IO)
-        {
-            Log.d("ANBU: Category configured", category.value.toString())
-            fetchList.postValue(category.value?.let { newsDataRepo.getNews(category.value.toString()) })
-            fetchDone.postValue(true)
-        }
-    }
-
-    fun observeCategory(): MutableLiveData<String> {
-        return category
-    }
-
-    fun setCategory(newCategory: String){
-        // category.value = emptyList()
-        category.value = newCategory
-    }
-
     fun observeLiveData(): LiveData<List<NewsPost>> {
         return fetchList
-    }
-
-    fun getCategories(): MutableLiveData<String> {
-        return category
     }
 
     fun removeFav(albumRec: NewsPost) {
@@ -311,10 +293,6 @@ class MainViewModel(): ViewModel() {
 
     fun observeSearchPostLiveData(): LiveData<List<NewsPost>>{
         return searchPosts
-    }
-
-    fun observeBookmarkSearchPostLiveData(): LiveData<List<NewsMetaData>>{
-        return searchBookmarkPosts
     }
 
     // Convenient place to put it as it is shared

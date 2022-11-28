@@ -80,12 +80,8 @@ class SportsFragment: Fragment() {
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.observeCategory().observe(viewLifecycleOwner){
-            viewModel.netPosts()
-        }
-
         binding.swipeRefreshLayout.setOnRefreshListener{
-            viewModel.netPosts()
+            viewModel.getFeedForCategory()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {

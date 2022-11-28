@@ -80,11 +80,11 @@ class BusinessFragment: Fragment() {
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.observeCategory().observe(viewLifecycleOwner){
+        /*viewModel.observeCategory().observe(viewLifecycleOwner){
             //if (viewModel.getCategories().value?.isEmpty() == false){
             viewModel.netPosts()
             adapter.notifyDataSetChanged()
-        }
+        }*/
 
         binding.swipeRefreshLayout.setOnRefreshListener{
             viewModel.netPosts()
@@ -116,5 +116,12 @@ class BusinessFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun setMenuVisibility(menuVisible: Boolean) {
+        super.setMenuVisibility(menuVisible)
+        if (view != null && menuVisible){
+
+        }
     }
 }

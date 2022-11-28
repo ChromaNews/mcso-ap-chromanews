@@ -73,12 +73,12 @@ class EntertainmentFragment: Fragment() {
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
 
-        viewModel.observeCategory().observe(viewLifecycleOwner){
+        /*viewModel.observeCategory().observe(viewLifecycleOwner){
        //     //if (viewModel.getCategories().value?.isEmpty() == false){
             viewModel.netPosts()
             //}
             // adapter.notifyDataSetChanged()
-        }
+        }*/
 
         viewModel.observeLiveData().observe(viewLifecycleOwner){
             Log.d("ANBU: ", "ObserveLiveData")

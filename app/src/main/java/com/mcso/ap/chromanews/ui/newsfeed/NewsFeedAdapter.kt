@@ -1,5 +1,6 @@
 package com.mcso.ap.chromanews.ui.newsfeed
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.util.Log
@@ -103,30 +104,19 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: VH, position: Int) {
 
-        val category_list = viewModel.getCategories().value
-
         val binding = holder.rowPostBinding
-
         var item = getItem(position)
 
-        Log.d("ANBU title: ", item.title.toString())
-        Log.d("ANBU description:  ", item.description.toString())
-        Log.d("ANBU content: ", item.content.toString())
-
         binding.title.text = item.title
-
-        // binding.description.setLines(4)
         binding.description.text = item.description
-
         binding.title.setTextColor(Color.BLACK)
         binding.PubdateVal.setTextColor(Color.BLACK)
         binding.description.setTextColor(Color.BLACK)
-
         binding.authors.text = item.author
         binding.authors.setTextColor(Color.GREEN)
-        // binding.category.text = viewModel.getCategories().value.toString()
 
         if (item.imageURL != null){
             Glide.glideFetch(item.imageURL, null, binding.image)
@@ -164,8 +154,6 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             return oldItem.title == newItem.title
         }
         override fun areContentsTheSame(oldItem: NewsPost, newItem: NewsPost): Boolean {
-            // return  NewsPost.spannableStringsEqual(oldItem.title.toString(),
-            //                                       newItem.title.toString())
             return oldItem.title == newItem.title
         }
     }

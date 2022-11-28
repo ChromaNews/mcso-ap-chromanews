@@ -22,7 +22,8 @@ interface NewsDataApi {
     //2efd2e82e029486e8594bb91c7e01c92
     // old: 4fce6873f43b44d194825e906d825aa0
     // new: 2efd2e82e029486e8594bb91c7e01c92
-    @GET("v2/top-headlines?language=en&apiKey=2efd2e82e029486e8594bb91c7e01c92&pageSize=100")
+    // Nov 27th: fcedd3d6f6044ab3ba242bb98e9babbf  | cf98e9a0b37945e690f495886bc4b545
+    @GET("v2/top-headlines?language=en&apiKey=cf98e9a0b37945e690f495886bc4b545&pageSize=100")
     suspend fun getNews(@Query("category") category: String) : NewsDataResponse
 
     data class NewsDataResponse(
