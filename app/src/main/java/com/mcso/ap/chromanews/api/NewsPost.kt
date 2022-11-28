@@ -10,39 +10,18 @@ import com.google.gson.annotations.SerializedName
 data class NewsPost (
     @SerializedName("title")
     val title: String,
-    // val title: SpannableString,
-    // @SerializedName("link")
     @SerializedName("url")
     val link: String,
-    // @SerializedName("keywords")
-    // val keywords: List<String>? = null,
-    // @SerializedName("creator")
     @SerializedName("author")
     val author: String? = null,
-    // val creator: List<String>? = null,
-   //  @SerializedName("video_url")
-    // val videoURL: String?,
     @SerializedName("description")
     val description: String? = null,
-    // val description: SpannableString,
     @SerializedName("content")
     val content: String? = null,
-    // @SerializedName("pubDate")
     @SerializedName("publishedAt")
     val pubDate : String,
-    // @SerializedName("image_url")
     @SerializedName("urlToImage")
     val imageURL : String?,
-    // @SerializedName("source_id")
-    // val sourceId: String,
-    // @SerializedName("source")
-    // val source: Map<Int,String>
-    // @SerializedName("country")
-    // val country: List<String>,
-    // @SerializedName("category")
-    // val category: List<String>,
-    // @SerializedName("language")
-    // val language: String
 ) {
     companion object {
         // NB: This only highlights the first match in a string
@@ -69,34 +48,7 @@ data class NewsPost (
 
         }
     }
-    private fun clearSpan(str: SpannableString?) {
-        str?.clearSpans()
-        str?.setSpan(
-            ForegroundColorSpan(Color.GRAY), 0, 0,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-    }
-    // clearSpans does not invalidate the textview
-    // We have to assign a span to make sure text gets redrawn, so assign
-    // a span that does nothing
-    private fun removeAllCurrentSpans(){
-        // Erase all spans
-        // clearSpan(title)
-        // clearSpan(description)
-        // clearSpan(content)
-        // clearSpan(category)
-    }
 
-    // Given a search string, look for it in the RedditPost.  If found,
-    // highlight it and return true, otherwise return false.
-    fun searchFor(searchTerm: String): Boolean {
-        // XXX Write me, search both regular posts and subreddit listings
-        return true
-    }
-
-    // NB: This changes the behavior of lists of RedditPosts.  I want posts fetched
-    // at two different times to compare as equal.  By default, they will be different
-    // objects with different hash codes.
     override fun equals(other: Any?) : Boolean =
         if (other is NewsPost) {
             title == other.title

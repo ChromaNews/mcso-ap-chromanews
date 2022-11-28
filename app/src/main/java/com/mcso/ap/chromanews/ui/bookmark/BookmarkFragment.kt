@@ -16,14 +16,10 @@ import kotlin.collections.ArrayList
 import com.mcso.ap.chromanews.ui.newsfeed.NewsFeedAdapter
 
 class BookmarkFragment : Fragment() {
-    // https://developer.android.com/topic/libraries/view-binding#fragments
     private var _binding: FragmentRvBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
-
     // private val viewModel: MainViewModel by viewModels()
     private var bookmarkadapter: BookmarkAdapter? = null
 
@@ -40,7 +36,6 @@ class BookmarkFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // (requireActivity() as AppCompatActivity).supportActionBar?.title = "Bookmarks"
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         var adapter = BookmarkAdapter(viewModel)
         bookmarkadapter = adapter
@@ -56,79 +51,6 @@ class BookmarkFragment : Fragment() {
             adapter.submitList(it)
             adapter.notifyDataSetChanged()
         }
-
-        // viewModel.observeBookmarkSearchPostLiveData().observe(viewLifecycleOwner) {
-        //    adapter.submitList(it)
-        //    adapter.notifyDataSetChanged()
-        // }
     }
 }
 
-/*
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater!!.inflate(R.menu.search_menu, menu)
-
-        val item = menu?.findItem(R.id.action_search)
-        val searchView = item?.actionView as SearchView
-
-
-        // search queryTextChange Listener
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                Log.d("onQueryTextChangeNewsFeed", "BookmarkFragment query: " + query)
-                viewModel.setSearchTerm(query.toString())
-                // if (query != null) {
-                //    filter(query)
-                // }
-                return true
-            }
-        })
-    }
-}
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id=item.itemId
-        when (id) {
-            R.id.action_search -> {
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun filter(text: String) {
-        val filteredlist = ArrayList<NewsMetaData>()
-        val savedNewsList =  viewModel.observeSavedNewsList().value
-        if (savedNewsList != null) {
-            for (item in savedNewsList) {
-                if (item.title!!.lowercase(Locale.getDefault())
-                        .contains(text.lowercase(Locale.getDefault()))
-                ) {
-                    filteredlist.add(item)
-                }
-            }
-        }
-        if (filteredlist.isEmpty()) {
-            Toast.makeText(context, "No Data Found..", Toast.LENGTH_SHORT).show()
-        } else {
-            bookmarkadapter?.filterList(filteredlist, text)
-            viewModel.setBookmarkList(filteredlist)
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-}
-*/

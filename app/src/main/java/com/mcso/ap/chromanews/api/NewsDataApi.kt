@@ -19,10 +19,10 @@ interface NewsDataApi {
     // https://newsdata.io/api/1/news?apikey=YOUR_API_KEY&language=en&category=entertainment
     // @GET("api/1/news?language=en&apiKey=pub_13176ea88c295f0b89581072689b85a83fd3d")
    //  @GET("api/1/news?language=en&apiKey=pub_12303667ee10695fdd352d11f5c219d31f649")
-    //2efd2e82e029486e8594bb91c7e01c92
     // old: 4fce6873f43b44d194825e906d825aa0
     // new: 2efd2e82e029486e8594bb91c7e01c92
-    @GET("v2/top-headlines?language=en&apiKey=2efd2e82e029486e8594bb91c7e01c92&pageSize=100")
+    // da535551e63549b8b9b3e246a7eea7ff
+    @GET("v2/top-headlines?language=en&apiKey=da535551e63549b8b9b3e246a7eea7ff&pageSize=100")
     suspend fun getNews(@Query("category") category: String) : NewsDataResponse
 
     data class NewsDataResponse(
@@ -31,25 +31,7 @@ interface NewsDataApi {
         val articles: List<NewsPost>,
     )
 
-   data class NewsChildrenResponse(
-        val data: List<NewsPost>
-        )
-
-
-    class SpannableDeserializer : JsonDeserializer<SpannableString> {
-        // @Throws(JsonParseException::class)
-        override fun deserialize(
-            json: JsonElement,
-            typeOfT: Type,
-            context: JsonDeserializationContext
-        ): SpannableString {
-            return SpannableString(json.asString)
-        }
-    }
-
     companion object {
-
-        //private const val hostUrl = "newsdata.io"
         private const val hostUrl = "newsapi.org"
         var url = HttpUrl.Builder().scheme("https")
             .host(hostUrl)

@@ -52,9 +52,6 @@ class MainViewModel(): ViewModel() {
     private var showProgress = MutableLiveData<Boolean>()
 
     // newsdata
-    private val newsDataList = MediatorLiveData<List<NewsPost>>().apply {
-        value = mutableListOf()
-    }
 
     // fun getCurrentUser() : FirebaseUser? {
     //    return firebaseAuth.currentUser
@@ -63,11 +60,9 @@ class MainViewModel(): ViewModel() {
     // for bookmarked news
     private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
     private var savedNewsList = MutableLiveData<List<NewsMetaData>>()
-    // private var filterbookmarkedList = MutableLiveData<List<NewsMetaData>>()
 
     fun fetchSavedNewsList() {
         savednewsDataDB.fetchSavedNews(savedNewsList)
-        // filterbookmarkedList = savedNewsList
     }
 
     fun observeSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
@@ -81,10 +76,6 @@ class MainViewModel(): ViewModel() {
     private var category = MutableLiveData<String>().apply{
         value = "business"
     }
-
-    // fun setBookmarkList(bookMlist: List<NewsMetaData>){
-    //    filterbookmarkedList.postValue(bookMlist)
-    // }
 
     fun getNewsMeta(position: Int) : NewsMetaData {
         val news = savedNewsList.value?.get(position)
@@ -131,7 +122,6 @@ class MainViewModel(): ViewModel() {
         firebaseAuthLiveData.updateUser()
     }
 
-    private var title = MutableLiveData<String>()
     private var searchTerm: MutableLiveData<String> = MutableLiveData("")
     var fetchDone : MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -150,7 +140,6 @@ class MainViewModel(): ViewModel() {
     }
 
     init{
-        // netPosts()
         fetchSavedNewsList()
     }
 
@@ -159,7 +148,7 @@ class MainViewModel(): ViewModel() {
             context = viewModelScope.coroutineContext
                     + Dispatchers.IO)
         {
-            Log.d("ANBU: Category configured", category.value.toString())
+            Log.d("ANBU:", "Network Fetch")
             fetchList.postValue(category.value?.let { newsDataRepo.getNews(category.value.toString()) })
             fetchDone.postValue(true)
         }
@@ -170,7 +159,7 @@ class MainViewModel(): ViewModel() {
     }
 
     fun setCategory(newCategory: String){
-        // category.value = emptyList()
+        Log.d("ANBU:", "Network Fetch - In Set Category")
         category.value = newCategory
     }
 
@@ -188,17 +177,11 @@ class MainViewModel(): ViewModel() {
             it.remove(albumRec)
             favPostsList.value = it
         }
-        Log.d("ANBU removeFav:", favPostsList.value?.size.toString())
-        Log.d("ANBU removeFav List:", favPostsList.value.toString())
     }
 
 
     fun isFav(albumRec: NewsPost): Boolean {
         var fav =  favPostsList.value?.contains(albumRec) ?: false
-       // var fav = savedNewsList.value.contains(albumRec) ?: false
-
-        Log.d("ANBU: isFav : ", albumRec.toString())
-        Log.d("ANBU: isFav exists: ", fav.toString())
         return fav
     }
 
@@ -218,103 +201,6 @@ class MainViewModel(): ViewModel() {
             it.add(albumRec)
             favPostsList.value = it
         }
-        Log.d("ANBU addFav ", favPostsList.value.toString())
-    }
-
-    // Search posts
-    private fun setSpan(fulltext: SpannableString, subtext: String): Boolean {
-        if( subtext.isEmpty() ) return true
-        val i = fulltext.indexOf(subtext, ignoreCase = true)
-        if( i == -1 ) return false
-        fulltext.setSpan(
-            ForegroundColorSpan(Color.BLUE), i, i + subtext.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        
-        return true
-    }
-
-    private fun clearSpan(str: SpannableString?) {
-        str?.clearSpans()
-        str?.setSpan(
-            ForegroundColorSpan(Color.GRAY), 0, 0,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-    }
-
-    private fun removeAllCurrentSpans(){
-        fetchList.value?.forEach {
-            SpannableString(it.title).clearSpans()
-            // clearSpan(SpannableString(it.title))
-           // SpannableString(it.description!!).clearSpans()
-        }
-    }
-
-    private fun removeAllSubredditCurrentSpans(){
-        savedNewsList.value?.forEach {
-            SpannableString(it.title).clearSpans()
-            // it.description!!.clearSpans()
-        }
-    }
-
-    private var searchPosts = MediatorLiveData<List<NewsPost>>().apply {
-        addSource(fetchList)  { value = filterList() }
-        addSource(searchTerm)  { value = filterList() }
-
-        Log.d("ANBU: NewsFeedFragment", fetchList.value.toString())
-        value = fetchList.value
-    }
-
-    private var searchBookmarkPosts = MediatorLiveData<List<NewsMetaData>>().apply {
-        addSource(savedNewsList) { value = filterBookmarkList()}
-        addSource(searchTerm)  { value = filterBookmarkList()}
-
-        Log.d("ANBU: BookmarkFragment", savedNewsList.value.toString())
-        value = savedNewsList.value
-    }
-
-    private fun filterList(): List<NewsPost> {
-        Log.d(javaClass.simpleName,
-            "FeedList Filter $searchTerm Q(${title.value})")
-
-        removeAllCurrentSpans()
-
-        val searchTermValue = searchTerm.value!!
-        return fetchList.value!!.filter {
-            var titleFound = false
-            // var selfTextFound = false
-            titleFound = setSpan(SpannableString(it.title), searchTermValue)
-            // selfTextFound = setSpan(SpannableString(it.description), searchTermValue.toString())
-
-           // titleFound || selfTextFound
-            titleFound
-        }
-    }
-
-    private fun filterBookmarkList(): List<NewsMetaData> {
-        Log.d(javaClass.simpleName,
-            "BookmarkFragment Filter $searchTerm Q(${title.value})")
-
-        removeAllSubredditCurrentSpans()
-
-        val searchTermValue = searchTerm.value!!
-        return savedNewsList.value!!.filter {
-            var displayFound = false
-            //var publicDescFound = false
-            displayFound = setSpan(SpannableString(it.title), searchTermValue)
-            //publicDescFound = setSpan(SpannableString(it.description), searchTermValue)
-
-            displayFound
-            //displayFound || publicDescFound
-        }
-    }
-
-    fun observeSearchPostLiveData(): LiveData<List<NewsPost>>{
-        return searchPosts
-    }
-
-    fun observeBookmarkSearchPostLiveData(): LiveData<List<NewsMetaData>>{
-        return searchBookmarkPosts
     }
 
     // Convenient place to put it as it is shared

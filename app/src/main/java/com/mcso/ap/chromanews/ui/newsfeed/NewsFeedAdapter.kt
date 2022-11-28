@@ -28,16 +28,12 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         init {
 
             rowPostBinding.root.setOnClickListener {
-                Log.d("ANBU", "ItemSelected ")
                 var item = getItem(adapterPosition)
-
-                Log.d("ANBU: Item", item.toString())
 
                 MainViewModel.doOnePost(rowPostBinding.root.context, item)
             }
 
             rowPostBinding.share.setOnClickListener {
-                Log.d("ANBU: ", "clicking share button")
                 val local = viewModel.getItemAt(adapterPosition)
 
                 val sharebody: String = local!!.title
@@ -52,11 +48,9 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             }
 
             rowPostBinding.bookmarkFav.setOnClickListener {
-                Log.d("ANBU: ", "Bookmark Selected")
                 val position = adapterPosition
                 // Toggle Bookmark
                 val local = viewModel.getItemAt(position)
-                Log.d("ANBU: Bookmark-1", local.toString())
 
                 if (viewModel.isFav(getItem(position))) {
                     // viewModel.removeFav(getItem(position))
@@ -69,12 +63,6 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
                     val item = viewModel.getItemAt(position)
 
                     if (item != null) {
-                        Log.d("ANBU: ", "calling createNewsMetadata")
-                        Log.d("ANBU: ", item.description.toString() )
-                        Log.d("ANBU: ", item.title.toString() )
-                        Log.d("ANBU: ", item.author.toString() )
-                        Log.d("ANBU: ", item.link.toString() )
-                        Log.d("ANBU: ", item.imageURL.toString() )
                         item.description?.let { it1 ->
                             item.imageURL?.let { it2 ->
                                     viewModel.createNewsMetadata(
@@ -110,10 +98,6 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         val binding = holder.rowPostBinding
 
         var item = getItem(position)
-
-        Log.d("ANBU title: ", item.title.toString())
-        Log.d("ANBU description:  ", item.description.toString())
-        Log.d("ANBU content: ", item.content.toString())
 
         binding.title.text = item.title
 

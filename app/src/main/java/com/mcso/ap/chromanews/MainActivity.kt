@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         AuthInit(viewModel,signInLauncher)
 
         viewPager2 = findViewById(R.id.view_pager)
+        viewPager2.offscreenPageLimit = 1
         tabLayout = findViewById(R.id.tab_layout)
 
         titles.add("Business")
@@ -99,9 +100,6 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         // viewPager2.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                Log.d("ANBU: ", "onTabSelected")
-                Log.d("ANBU: tab position", tab.position.toString())
-                Log.d("ANBU: fragment tab position", tab.text.toString())
                 var selectedTab = tab.text.toString().lowercase(Locale.ROOT)
                 viewModel.setCategory(selectedTab)
 

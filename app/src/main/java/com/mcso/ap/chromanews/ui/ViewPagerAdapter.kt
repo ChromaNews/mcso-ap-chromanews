@@ -7,6 +7,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerAdapter(fragmentActivity: FragmentActivity?) :
     FragmentStateAdapter(fragmentActivity!!) {
+
     private var fragments //variable holds the fragments the ViewPager2 allows us to swipe to.
             : ArrayList<Fragment>? = null
 

@@ -1,6 +1,5 @@
 package com.mcso.ap.chromanews.ui.bookmark
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
@@ -11,8 +10,6 @@ import com.mcso.ap.chromanews.databinding.SavedNewsBinding
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.Glide
-import com.mcso.ap.chromanews.databinding.FragmentRvBinding
-
 
 class BookmarkAdapter(private val viewModel: MainViewModel)
     : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(RedditDiff()) {
@@ -25,7 +22,7 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
 
     private fun getPos(holder: RecyclerView.ViewHolder): Int {
         val pos = holder.adapterPosition
-        Log.d("ANBU: calling getPos position", pos.toString())
+
         if (pos == RecyclerView.NO_POSITION) {
             return holder.adapterPosition
         }
@@ -36,7 +33,6 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
         init {
 
             rowBinding.root.setOnClickListener {
-                Log.d("ANBU", "ItemSelected ")
                 val position = getPos(this)
                 var item = viewModel.getSavedNewsList().value!![position]
                 MainViewModel.openSavedNewsPost(rowBinding.root.context, item)
@@ -44,10 +40,7 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
 
             rowBinding.delete.setOnClickListener {
                 val position = getPos(this)
-                Log.d("ANBU: calling", "delete OnListener position")
-                Log.d("ANBU: ", position.toString())
                 viewModel.removeSavedNews(position)
-                // notifyDataSetChanged()
             }
         }
     }
@@ -62,9 +55,6 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val adapterPosition = getPos(holder)
-
-        Log.d("ANBU: ", "calling onBindViewHolder adapterPosition")
-        Log.d("ANBU: ", adapterPosition.toString())
 
         val item = viewModel.getNewsMeta(adapterPosition)
 
@@ -94,8 +84,6 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
         }
 
         override fun areContentsTheSame(oldItem: NewsMetaData, newItem: NewsMetaData): Boolean {
-            // return  NewsPost.spannableStringsEqual(oldItem.title.toString(),
-            //                                       newItem.title.toString())
             return oldItem.firestoreID == newItem.firestoreID
                     && oldItem.newsID == newItem.newsID
         }

@@ -38,54 +38,31 @@ class HealthFragment: Fragment() {
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater!!.inflate(R.menu.search_menu, menu)
-
-        val item = menu?.findItem(R.id.action_search)
-        val searchView = item?.actionView as SearchView
-
-
-        // search queryTextChange Listener
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                return true
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                Log.d("ANBU onQueryTextChangeNewsFeed", "query: " + query)
-                viewModel.setSearchTerm(query.toString())
-                return true
-            }
-        })
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(javaClass.simpleName, "ANBU NewsFeedFragment onViewCreated")
 
-        // (requireActivity() as AppCompatActivity).supportActionBar?.title = "News Feed"
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
 
-        viewModel.observeLiveData().observe(viewLifecycleOwner){
+        viewModel.observeLiveData().observe(viewLifecycleOwner) {
             Log.d("ANBU: ", "ObserveLiveData")
-            adapter.submitList(it){
-                binding.recyclerRVView.scrollToPosition(0)
-            }
+            adapter.submitList(it)
+            // {
+            //    binding.recyclerRVView.scrollToPosition(0)
+            //}
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.observeCategory().observe(viewLifecycleOwner){
-            viewModel.netPosts()
+        viewModel.observeCategory().observe(viewLifecycleOwner) {
+            if (it == "health"){
+                viewModel.netPosts()
+                adapter.notifyDataSetChanged()
+            }
         }
 
-        binding.swipeRefreshLayout.setOnRefreshListener{
+        binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.netPosts()
         }
 
@@ -93,14 +70,8 @@ class HealthFragment: Fragment() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        // Observing the search post
-        viewModel.observeSearchPostLiveData().observe(viewLifecycleOwner){
-            adapter.submitList(it)
-            adapter.notifyDataSetChanged()
-       }
-
         // sentiment analyzer
-        viewModel.observeSentimentScore().observe(viewLifecycleOwner){ sentimentData ->
+        viewModel.observeSentimentScore().observe(viewLifecycleOwner) { sentimentData ->
             run {
                 val score = String.format(
                     "%.6f", sentimentData.score.toDouble()
@@ -108,7 +79,18 @@ class HealthFragment: Fragment() {
                 viewModel.updateUserSentiment(score)
             }
         }
+    }
 
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        if (isVisibleToUser) {
+            viewModel.netPosts()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        userVisibleHint = true
     }
 
     override fun onDestroyView() {
