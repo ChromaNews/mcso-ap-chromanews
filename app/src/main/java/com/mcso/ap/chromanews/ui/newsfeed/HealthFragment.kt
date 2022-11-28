@@ -49,21 +49,12 @@ class HealthFragment: Fragment() {
         viewModel.observeLiveData().observe(viewLifecycleOwner) {
             Log.d("ANBU: ", "ObserveLiveData")
             adapter.submitList(it)
-            // {
-            //    binding.recyclerRVView.scrollToPosition(0)
-            //}
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.observeCategory().observe(viewLifecycleOwner) {
-            if (it == "health"){
-                viewModel.netPosts()
-                adapter.notifyDataSetChanged()
-            }
-        }
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.netPosts()
+        binding.swipeRefreshLayout.setOnRefreshListener{
+            viewModel.getFeedForCategory()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
@@ -79,18 +70,6 @@ class HealthFragment: Fragment() {
                 viewModel.updateUserSentiment(score)
             }
         }
-    }
-
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-        if (isVisibleToUser) {
-            viewModel.netPosts()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        userVisibleHint = true
     }
 
     override fun onDestroyView() {

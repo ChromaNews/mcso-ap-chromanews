@@ -25,13 +25,10 @@ import com.mcso.ap.chromanews.ui.sentiment.MoodColorFragment
 
 class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStrategy
 {
-
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager2: ViewPager2
-    private lateinit var simpleFrameLayout: FrameLayout
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
-    private lateinit var recyclerView: RecyclerView
     private var actionBarBinding: ActionBarBinding? = null
     private val titles = ArrayList<String>()
 
@@ -70,7 +67,6 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
 
         titles.add("Business")
         titles.add("Entertainment")
-        // titles.add("General")
         titles.add("Health")
         titles.add("Science")
         titles.add("Sports")
@@ -84,24 +80,25 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
 
         fragmentList.add(BusinessFragment())
         fragmentList.add(EntertainmentFragment())
-        // fragmentList.add(GeneralFragment())
         fragmentList.add(HealthFragment())
         fragmentList.add(ScienceFragment())
         fragmentList.add(SportsFragment())
         fragmentList.add(TechnologyFragment())
         fragmentList.add(BookmarkFragment())
-        fragmentList.add(ConflictMapFragment())
         fragmentList.add(MoodColorFragment())
+        fragmentList.add(ConflictMapFragment())
         viewPager2Adapter.setData(fragmentList) //sets the data for the adapter
 
         viewPager2.adapter = viewPager2Adapter
         TabLayoutMediator(tabLayout, viewPager2, this).attach()
 
-        // viewPager2.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                Log.d(TAG, "selected ${tab.text} at position ${tab.position}")
                 var selectedTab = tab.text.toString().lowercase(Locale.ROOT)
+
                 viewModel.setCategory(selectedTab)
+                viewModel.getFeedForCategory()
 
                 if (selectedTab == "bookmarks"){
                     viewModel.fetchSavedNewsList()

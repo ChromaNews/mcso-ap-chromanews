@@ -2,12 +2,7 @@ package com.mcso.ap.chromanews.model
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.util.Log
-import androidx.core.text.clearSpans
 import androidx.lifecycle.*
 import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
@@ -30,6 +25,7 @@ class MainViewModel(): ViewModel() {
     private val firebaseAuthLiveData = FirebaseUserLiveData()
 
     // NewsData repo and api
+    private var category = "business"
     private val newsDataApi = NewsDataApi.create()
     private val newsDataRepo = NewsDataRepo(newsDataApi)
 
@@ -40,7 +36,6 @@ class MainViewModel(): ViewModel() {
 
     // Sentiment data DB
     private val sentimentDataDB: SentimentDBHelper = SentimentDBHelper()
-    private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
 
     // sentiment color rating data
     private val ratingDateList = MutableLiveData<List<Double>>()
@@ -53,13 +48,29 @@ class MainViewModel(): ViewModel() {
 
     // newsdata
 
-    // fun getCurrentUser() : FirebaseUser? {
-    //    return firebaseAuth.currentUser
-    //}
 
     // for bookmarked news
     private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
     private var savedNewsList = MutableLiveData<List<NewsMetaData>>()
+
+    init{
+        getFeedForCategory()
+    }
+
+    fun getFeedForCategory(){
+        viewModelScope.launch (
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO)
+        {
+            Log.d(TAG, "fetching news feed for [${category}]")
+            fetchList.postValue(newsDataRepo.getNews(category))
+            fetchDone.postValue(true)
+        }
+    }
+
+    fun setCategory(tabCategory: String){
+        category = tabCategory
+    }
 
     fun fetchSavedNewsList() {
         savednewsDataDB.fetchSavedNews(savedNewsList)
@@ -71,10 +82,6 @@ class MainViewModel(): ViewModel() {
 
     fun getSavedNewsCount(): Int? {
         return savedNewsList.value?.size
-    }
-
-    private var category = MutableLiveData<String>().apply{
-        value = "business"
     }
 
     fun getNewsMeta(position: Int) : NewsMetaData {
@@ -143,32 +150,8 @@ class MainViewModel(): ViewModel() {
         fetchSavedNewsList()
     }
 
-    fun netPosts(){
-        viewModelScope.launch (
-            context = viewModelScope.coroutineContext
-                    + Dispatchers.IO)
-        {
-            Log.d("ANBU:", "Network Fetch")
-            fetchList.postValue(category.value?.let { newsDataRepo.getNews(category.value.toString()) })
-            fetchDone.postValue(true)
-        }
-    }
-
-    fun observeCategory(): MutableLiveData<String> {
-        return category
-    }
-
-    fun setCategory(newCategory: String){
-        Log.d("ANBU:", "Network Fetch - In Set Category")
-        category.value = newCategory
-    }
-
     fun observeLiveData(): LiveData<List<NewsPost>> {
         return fetchList
-    }
-
-    fun getCategories(): MutableLiveData<String> {
-        return category
     }
 
     fun removeFav(albumRec: NewsPost) {
@@ -201,6 +184,7 @@ class MainViewModel(): ViewModel() {
             it.add(albumRec)
             favPostsList.value = it
         }
+        Log.d("ANBU addFav ", favPostsList.value.toString())
     }
 
     // Convenient place to put it as it is shared

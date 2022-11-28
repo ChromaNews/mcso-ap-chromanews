@@ -51,25 +51,13 @@ class EntertainmentFragment: Fragment() {
         val adapter = NewsFeedAdapter(viewModel)
         binding.recyclerRVView.adapter = adapter
 
-        viewModel.observeCategory().observe(viewLifecycleOwner) {
-           if (it == "entertainment"){
-                Log.d("ANBU:", "Network Fetch -  entertainment In observeCategory")
-                viewModel.netPosts()
-                adapter.notifyDataSetChanged()
-            }
-        }
-
         viewModel.observeLiveData().observe(viewLifecycleOwner) {
             adapter.submitList(it)
-            //{
-            //    binding.recyclerRVView.scrollToPosition(0)
-            //}
             adapter.notifyDataSetChanged()
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.netPosts()
-            // adapter.notifyDataSetChanged()
+            viewModel.getFeedForCategory()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
@@ -85,18 +73,6 @@ class EntertainmentFragment: Fragment() {
                 viewModel.updateUserSentiment(score)
             }
         }
-    }
-
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-        if (isVisibleToUser) {
-            viewModel.netPosts()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        userVisibleHint = true
     }
 
     override fun onDestroyView() {

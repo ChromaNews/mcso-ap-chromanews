@@ -9,9 +9,8 @@ class NewsDataRepo(private val api: NewsDataApi) {
         val mutableList : MutableList<NewsPost> = arrayListOf()
 
         for (element in response.articles) {
-                mutableList.add(element)
-            }
-
+            mutableList.add(element)
+        }
         return mutableList.toList()
     }
 

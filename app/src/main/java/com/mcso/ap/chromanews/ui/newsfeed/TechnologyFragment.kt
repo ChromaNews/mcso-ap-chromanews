@@ -51,15 +51,8 @@ class TechnologyFragment: Fragment() {
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.observeCategory().observe(viewLifecycleOwner) {
-            if (it == "technology"){
-                viewModel.netPosts()
-                adapter.notifyDataSetChanged()
-            }
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.netPosts()
+        binding.swipeRefreshLayout.setOnRefreshListener{
+            viewModel.getFeedForCategory()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
@@ -75,18 +68,6 @@ class TechnologyFragment: Fragment() {
                 viewModel.updateUserSentiment(score)
             }
         }
-    }
-
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-        if (isVisibleToUser) {
-            viewModel.netPosts()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        userVisibleHint = true
     }
 
     override fun onDestroyView() {

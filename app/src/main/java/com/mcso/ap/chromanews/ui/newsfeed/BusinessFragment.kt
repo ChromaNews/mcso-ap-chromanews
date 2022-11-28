@@ -46,24 +46,11 @@ class BusinessFragment: Fragment() {
 
         viewModel.observeLiveData().observe(viewLifecycleOwner) {
             adapter.submitList(it)
-            //{
-                //binding.recyclerRVView.scrollToPosition(0)
-            //}
             adapter.notifyDataSetChanged()
         }
 
-       viewModel.observeCategory().observe(viewLifecycleOwner) {
-       //     //if (viewModel.getCategories().value?.isEmpty() == false){
-            if (it == "business"){
-       //         Log.d("ANBU:", "Network Fetch - business In observeCategory")
-                viewModel.netPosts()
-                adapter.notifyDataSetChanged()
-            }
-        }
-
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.netPosts()
-            // adapter.notifyDataSetChanged()
+            viewModel.getFeedForCategory()
         }
 
         viewModel.fetchDone.observe(viewLifecycleOwner) {
@@ -81,22 +68,16 @@ class BusinessFragment: Fragment() {
         }
     }
 
-
-override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-    super.setUserVisibleHint(isVisibleToUser)
-    if (isVisibleToUser) {
-        viewModel.netPosts()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
-}
 
-override fun onStart() {
-    super.onStart()
-    userVisibleHint = true
-}
 
-override fun onDestroyView() {
-    super.onDestroyView()
-    _binding = null
-}
+    override fun setMenuVisibility(menuVisible: Boolean) {
+        super.setMenuVisibility(menuVisible)
+        if (view != null && menuVisible){
 
+        }
+    }
 }
