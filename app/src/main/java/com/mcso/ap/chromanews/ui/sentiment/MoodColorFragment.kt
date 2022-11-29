@@ -57,12 +57,21 @@ class MoodColorFragment : Fragment() {
             // mind color
             binding.moodColor.setColorFilter(hexMoodColor)
         }
+
+        val defaultColor = Color.parseColor("#008000")
+
+        // default to green
+        binding.colorCode.setTextColor(Color.parseColor("#FFFFFF"))
+        binding.colorCode.setBackgroundColor(defaultColor)
+        binding.moodColor.setColorFilter(defaultColor)
     }
 
     override fun setMenuVisibility(menuVisible: Boolean) {
         super.setMenuVisibility(menuVisible)
-        if (view != null && menuVisible){
-          viewModel.calculateRating()
+        if (viewModel.getCurrentUser() != null){
+            if (view != null && menuVisible){
+                viewModel.calculateRating()
+            }
         }
     }
 

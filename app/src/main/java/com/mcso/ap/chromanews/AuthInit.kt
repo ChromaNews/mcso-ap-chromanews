@@ -29,5 +29,4 @@ class AuthInit(viewModel: MainViewModel, signInLauncher: ActivityResultLauncher<
             viewModel.updateUser()
         }
     }
-
 }

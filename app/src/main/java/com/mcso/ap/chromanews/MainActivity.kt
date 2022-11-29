@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         val logoutButton: FloatingActionButton = binding.logout
 
         logoutButton.setOnClickListener {
-            Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
+            showDialog()
         }
 
         viewPager2 = findViewById(R.id.view_pager)
@@ -103,7 +104,21 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
            override fun onTabUnselected(tab: TabLayout.Tab) {}
            override fun onTabReselected(tab: TabLayout.Tab) {}
         })
+    }
 
+    private fun showDialog(){
+        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this)
+        alertDialog.setTitle("Logout")
+        alertDialog.setMessage("Are you sure you want to logout?")
+        alertDialog.setPositiveButton("yes") { _, _ ->
+            Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
+            viewModel.logoutUser()
+            AuthInit(viewModel,signInLauncher)
+        }
+        alertDialog.setNegativeButton("No") { _, _ -> }
+        val alert: AlertDialog = alertDialog.create()
+        alert.setCanceledOnTouchOutside(false)
+        alert.show()
     }
 
     override fun onConfigureTab(tab: TabLayout.Tab, position: Int) {
