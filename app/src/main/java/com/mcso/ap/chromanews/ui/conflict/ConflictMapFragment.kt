@@ -107,6 +107,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         conflictsMap = googleMap
+        conflictsMap.setPadding(0,0, 0, 200)
 
         if (locationPermissionGranted){
             val permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
