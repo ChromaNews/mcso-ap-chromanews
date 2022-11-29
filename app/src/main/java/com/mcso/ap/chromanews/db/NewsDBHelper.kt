@@ -5,11 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
-import com.mcso.ap.chromanews.model.sentiment.RatingDate
 import com.mcso.ap.chromanews.model.sentiment.UserSentimentData
-import okhttp3.internal.toImmutableList
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 class NewsDBHelper {
@@ -50,31 +46,6 @@ class NewsDBHelper {
         limitAndGet(query, newsList)
     }
 
-    /*
-    fun createNewsMetadata(
-        email: String,
-        newsMeta: NewsMetaData,
-        newsList: MutableLiveData<List<NewsMetaData>>
-    ) {
-        Log.d("ANBU: ","calling inside createNewsMetadata dbhelper ")
-        db.collection(rootCollection)
-            .document(email).add
-            .add(newsMeta)
-            .addOnSuccessListener {
-                Log.d(
-                    //  javaClass.simpleName,
-                    //  "Note create \"${elipsizeString(note.text)}\" id: ${note.firestoreID}"
-                    "ANBU: ", "calling Create createNewsMetadata addOnSuccessListener"
-                )
-                fetchSavedNews(newsList)
-            }
-            .addOnFailureListener { e ->
-                //  Log.d(javaClass.simpleName, "Note create FAILED \"${elipsizeString(note.text)}\"")
-                Log.d("ANBU: ", "calling Create createNewsMetadata addOnFailureListener")
-                Log.w(javaClass.simpleName, "Error ", e)
-            }
-    }
-     */
 
     private fun createNewsMetadataUser(email: String){
         db.collection(rootCollection).document(email)
@@ -109,16 +80,12 @@ class NewsDBHelper {
                 .add(newsMeta)
                 .addOnSuccessListener {
                     Log.d(
-                        //  javaClass.simpleName,
-                        //  "Note create \"${elipsizeString(note.text)}\" id: ${note.firestoreID}"
-                        "ANBU: ", "calling Create createNewsMetadata addOnSuccessListener"
+                        javaClass.simpleName, "createNewsMetadata is executed successfully"
                     )
                     fetchSavedNews(email, newsList)
                 }
                 .addOnFailureListener { e ->
-                    //  Log.d(javaClass.simpleName, "Note create FAILED \"${elipsizeString(note.text)}\"")
-                    Log.d("ANBU: ", "calling Create createNewsMetadata addOnFailureListener")
-                    Log.w(javaClass.simpleName, "Error ", e)
+                    Log.w(javaClass.simpleName, "Error in creating news metadata ", e)
                 }
     }
 
@@ -133,13 +100,12 @@ class NewsDBHelper {
             .delete()
             .addOnSuccessListener {
                 Log.d(
-                    "ANBU: ", "calling Remove removeNewsMetadata addOnSuccessListener"
+                    javaClass.simpleName, "RemoveNewsMetadata is executed successfully"
                 )
                 fetchSavedNews(email, newsList)
             }
             .addOnFailureListener { e ->
-                Log.d("ANBU: ", "calling Remove removeNewsMetadata addOnFailureListener")
-                Log.w(javaClass.simpleName, "Error removing news Meta", e)
+                Log.w(javaClass.simpleName, "Error in removing news metadata", e)
             }
     }
 }
