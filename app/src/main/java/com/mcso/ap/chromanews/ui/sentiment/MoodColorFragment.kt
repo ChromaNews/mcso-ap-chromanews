@@ -58,9 +58,9 @@ class MoodColorFragment : Fragment() {
             binding.moodColor.setColorFilter(hexMoodColor)
         }
 
-        val defaultColor = Color.parseColor("#008000")
-
         // default to green
+        Log.d(TAG, "setting default color")
+        val defaultColor = Color.parseColor("#008000")
         binding.colorCode.setTextColor(Color.parseColor("#FFFFFF"))
         binding.colorCode.setBackgroundColor(defaultColor)
         binding.moodColor.setColorFilter(defaultColor)

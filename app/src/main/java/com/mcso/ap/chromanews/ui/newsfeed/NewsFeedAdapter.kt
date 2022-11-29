@@ -131,7 +131,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         }
 
         binding.title.setOnClickListener {
-            Log.d(TAG, "analyzing news: $it")
+            Log.d(TAG, "analyzing news: ${item.title}")
             viewModel.netAnalyzeNews(item.title)
         }
     }
