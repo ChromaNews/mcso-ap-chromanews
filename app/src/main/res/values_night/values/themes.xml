@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="DayTime" parent="Theme.AppCompat.DayNight">
+    <style name="DayTime" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -15,19 +15,4 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
-    <style name="DayLightTheme" parent="Theme.AppCompat.DayNight">
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="colorOnSecondary">@color/black</item>
-    </style>
-
-    <!-- second theme, hard coded colors for testing -->
-    <style name="DarkTheme" parent="Theme.AppCompat.DayNight">
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="colorOnSecondary">@color/white</item>
-    </style>
-
 </resources>
