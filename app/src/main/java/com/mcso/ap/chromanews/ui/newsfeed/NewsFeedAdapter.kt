@@ -130,10 +130,10 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             binding.bookmarkFav.setImageResource(R.drawable.baseline_bookmark_border_24)
         }
 
-        binding.title.setOnClickListener {
-            Log.d(TAG, "analyzing news: $it")
+        /*binding.title.setOnClickListener {
+            Log.d(TAG, "analyzing news: ${item.title}")
             viewModel.netAnalyzeNews(item.title)
-        }
+        }*/
     }
 
 

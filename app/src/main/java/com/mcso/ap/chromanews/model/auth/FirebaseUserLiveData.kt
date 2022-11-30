@@ -6,9 +6,6 @@ import com.google.firebase.auth.FirebaseUser
 
 class FirebaseUserLiveData : LiveData<FirebaseUser>() {
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val authStateListener = FirebaseAuth.AuthStateListener {
-        value = firebaseAuth.currentUser
-    }
 
     fun updateUser(){
         value = firebaseAuth.currentUser
@@ -18,5 +15,11 @@ class FirebaseUserLiveData : LiveData<FirebaseUser>() {
         return firebaseAuth.currentUser?.email
     }
 
+    fun logout(){
+        firebaseAuth.signOut()
+    }
 
+    fun getName(): String? {
+        return firebaseAuth.currentUser?.displayName
+    }
 }

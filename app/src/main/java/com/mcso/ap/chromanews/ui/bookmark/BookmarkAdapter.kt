@@ -6,10 +6,10 @@ import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.mcso.ap.chromanews.databinding.SavedNewsBinding
-import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
-import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.Glide
+import com.mcso.ap.chromanews.databinding.SavedNewsBinding
+import com.mcso.ap.chromanews.model.MainViewModel
+import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 
 class BookmarkAdapter(private val viewModel: MainViewModel)
     : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(RedditDiff()) {
@@ -89,13 +89,4 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
         }
     }
 
-    override fun getItemCount(): Int {
-        return viewModel.getSavedNewsCount()!!
-    }
-
-    fun filterList(filterList: List<NewsMetaData>, searchText: String) {
-        this.searchText = searchText
-        booklist = filterList
-        notifyDataSetChanged()
-    }
 }

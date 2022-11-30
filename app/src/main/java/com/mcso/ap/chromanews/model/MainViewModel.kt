@@ -122,6 +122,18 @@ class MainViewModel(): ViewModel() {
         firebaseAuthLiveData.updateUser()
     }
 
+    fun getCurrentUser(): String?{
+        return firebaseAuthLiveData.getUser()
+    }
+
+    fun getCurrentUserName(): String? {
+        return firebaseAuthLiveData.getName()
+    }
+
+    fun logoutUser(){
+        firebaseAuthLiveData.logout()
+    }
+
     private var searchTerm: MutableLiveData<String> = MutableLiveData("")
     var fetchDone : MutableLiveData<Boolean> = MutableLiveData(false)
 

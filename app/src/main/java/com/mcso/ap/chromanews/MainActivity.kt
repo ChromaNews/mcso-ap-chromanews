@@ -4,12 +4,15 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mcso.ap.chromanews.databinding.ActionBarBinding
@@ -30,12 +33,10 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
     private lateinit var viewPager2: ViewPager2
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
-    private var actionBarBinding: ActionBarBinding? = null
     private val titles = ArrayList<String>()
 
     companion object {
         private val TAG = "MainActivity"
-        private const val mainFragTag = "mainFragTag"
     }
 
     // call back once log signInIntent is completed in AuthInit()
@@ -43,13 +44,12 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
             result ->
         run {
             if (result.resultCode == Activity.RESULT_OK) {
-                // viewModel.updateUser()
+                viewModel.updateUser()
             } else {
                 Log.e(MainActivity.TAG, "User login failed")
             }
         }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +57,14 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // setSupportActionBar(binding.toolbarMain)
-
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
+
+        val logoutButton: FloatingActionButton = binding.logout
+
+        logoutButton.setOnClickListener {
+            showDialog()
+        }
 
         viewPager2 = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
@@ -98,7 +102,21 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
            override fun onTabUnselected(tab: TabLayout.Tab) {}
            override fun onTabReselected(tab: TabLayout.Tab) {}
         })
+    }
 
+    private fun showDialog(){
+        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this)
+        alertDialog.setTitle("Logout")
+        alertDialog.setMessage("Are you sure you want to logout?")
+        alertDialog.setPositiveButton("yes") { _, _ ->
+            Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
+            viewModel.logoutUser()
+            AuthInit(viewModel,signInLauncher)
+        }
+        alertDialog.setNegativeButton("No") { _, _ -> }
+        val alert: AlertDialog = alertDialog.create()
+        alert.setCanceledOnTouchOutside(false)
+        alert.show()
     }
 
     override fun onConfigureTab(tab: TabLayout.Tab, position: Int) {
