@@ -57,16 +57,6 @@ class SportsFragment: Fragment() {
         viewModel.fetchDone.observe(viewLifecycleOwner) {
             binding.swipeRefreshLayout.isRefreshing = false
         }
-
-        // sentiment analyzer
-        viewModel.observeSentimentScore().observe(viewLifecycleOwner) { sentimentData ->
-            run {
-                val score = String.format(
-                    "%.6f", sentimentData.score.toDouble()
-                ).toDouble()
-                viewModel.updateUserSentiment(score)
-            }
-        }
     }
 
     override fun onDestroyView() {
