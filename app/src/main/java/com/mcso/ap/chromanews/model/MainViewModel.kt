@@ -126,6 +126,10 @@ class MainViewModel(): ViewModel() {
         return firebaseAuthLiveData.getUser()
     }
 
+    fun getCurrentUserName(): String? {
+        return firebaseAuthLiveData.getName()
+    }
+
     fun logoutUser(){
         firebaseAuthLiveData.logout()
     }

@@ -18,4 +18,8 @@ class FirebaseUserLiveData : LiveData<FirebaseUser>() {
     fun logout(){
         firebaseAuth.signOut()
     }
+
+    fun getName(): String? {
+        return firebaseAuth.currentUser?.displayName
+    }
 }
