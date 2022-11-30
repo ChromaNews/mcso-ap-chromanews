@@ -100,9 +100,9 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
 
         binding.title.text = item.title
         binding.description.text = item.description
-        binding.title.setTextColor(Color.BLACK)
-        binding.PubdateVal.setTextColor(Color.BLACK)
-        binding.description.setTextColor(Color.BLACK)
+        // binding.title.setTextColor(Color.BLACK)
+        // binding.PubdateVal.setTextColor(Color.BLACK)
+        // binding.description.setTextColor(Color.BLACK)
         binding.authors.text = item.author
         binding.authors.setTextColor(Color.GREEN)
 

@@ -36,7 +36,7 @@ class MoodColorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //viewModel.calculateRating()
+        // viewModel.calculateRating()
 
         viewModel.observeRatingByDate().observe(viewLifecycleOwner){
             calculateSentimentColorCode(it)
@@ -63,7 +63,7 @@ class MoodColorFragment : Fragment() {
     override fun setMenuVisibility(menuVisible: Boolean) {
         super.setMenuVisibility(menuVisible)
         if (view != null && menuVisible){
-          //  viewModel.calculateRating()
+       //   viewModel.calculateRating()
         }
     }
 
