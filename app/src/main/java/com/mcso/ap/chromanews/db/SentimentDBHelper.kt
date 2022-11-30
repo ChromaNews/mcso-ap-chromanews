@@ -128,6 +128,8 @@ class SentimentDBHelper {
                 if (ratingByDate.size > 0){
                     Log.d(TAG, "total rate: ${ratingByDate[0]}")
                     ratingDateList.postValue(ratingByDate)
+                } else {
+                    ratingDateList.postValue(mutableListOf(0.0))
                 }
             }
     }

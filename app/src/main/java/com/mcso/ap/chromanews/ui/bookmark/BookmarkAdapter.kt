@@ -80,8 +80,4 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
                     && oldItem.newsID == newItem.newsID
         }
     }
-
-    override fun getItemCount(): Int {
-        return viewModel.getSavedNewsCount()!!
-    }
 }

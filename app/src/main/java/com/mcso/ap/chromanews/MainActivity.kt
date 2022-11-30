@@ -33,12 +33,10 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
     private lateinit var viewPager2: ViewPager2
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
-    private var actionBarBinding: ActionBarBinding? = null
     private val titles = ArrayList<String>()
 
     companion object {
         private val TAG = "MainActivity"
-        private const val mainFragTag = "mainFragTag"
     }
 
     // call back once log signInIntent is completed in AuthInit()
@@ -46,7 +44,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
             result ->
         run {
             if (result.resultCode == Activity.RESULT_OK) {
-                // viewModel.updateUser()
+                viewModel.updateUser()
             } else {
                 Log.e(MainActivity.TAG, "User login failed")
             }
