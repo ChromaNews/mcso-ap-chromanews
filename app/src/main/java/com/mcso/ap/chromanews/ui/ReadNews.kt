@@ -12,6 +12,7 @@ import android.webkit.WebSettings
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.mcso.ap.chromanews.R
+import com.mcso.ap.chromanews.databinding.ActivityReadNewsBinding
 
 
 class ReadNews : AppCompatActivity() {
@@ -22,9 +23,14 @@ class ReadNews : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_read_news)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        var activityReadNewsBinding = ActivityReadNewsBinding.inflate(layoutInflater)
+
+        setContentView(activityReadNewsBinding.root)
+
+        setSupportActionBar(activityReadNewsBinding.toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true);
 
         val bundle: Bundle? = intent.extras
 

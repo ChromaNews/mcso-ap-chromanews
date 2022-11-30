@@ -6,6 +6,7 @@ import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mcso.ap.chromanews.R
 
@@ -58,6 +59,13 @@ class TechnologyFragment: Fragment() {
         viewModel.fetchDone.observe(viewLifecycleOwner) {
             binding.swipeRefreshLayout.isRefreshing = false
         }
+
+        viewModel.observeSearchPostLiveData().observe(viewLifecycleOwner,
+            Observer { filterList ->
+                adapter.submitList(filterList)
+                adapter.notifyDataSetChanged()
+            }
+        )
 
         // sentiment analyzer
         viewModel.observeSentimentScore().observe(viewLifecycleOwner) { sentimentData ->
