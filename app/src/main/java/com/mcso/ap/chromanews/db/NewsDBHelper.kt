@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
+import com.mcso.ap.chromanews.model.sentiment.UserSentimentData
 
 
 class NewsDBHelper {
@@ -12,9 +13,11 @@ class NewsDBHelper {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val rootCollection = "bookmarkNews"
+    private val newsCollection = "newsList"
 
-    fun fetchSavedNews(newsList: MutableLiveData<List<NewsMetaData>>) {
-        dbFetchSavedNews(newsList)
+    fun fetchSavedNews(email: String,
+                       newsList: MutableLiveData<List<NewsMetaData>>) {
+        dbFetchSavedNews(email, newsList)
     }
     private fun limitAndGet(query: Query, newsList: MutableLiveData<List<NewsMetaData>>) {
         query
@@ -31,55 +34,78 @@ class NewsDBHelper {
             }
     }
 
-    private fun dbFetchSavedNews(newsList: MutableLiveData<List<NewsMetaData>>) {
+    private fun dbFetchSavedNews(email: String,
+                                 newsList: MutableLiveData<List<NewsMetaData>>) {
         var sortColumn = "newsID"
 
         var sortby = Query.Direction.ASCENDING
 
-        var query = db.collection(rootCollection)
+        var query = db.collection(rootCollection).document(email).collection(newsCollection)
             .orderBy(sortColumn, sortby)
 
         limitAndGet(query, newsList)
     }
 
-    fun createNewsMetadata(
-        newsMeta: NewsMetaData,
-        newsList: MutableLiveData<List<NewsMetaData>>
-    ) {
-        Log.d("ANBU: ","calling inside createNewsMetadata dbhelper ")
-        db.collection(rootCollection)
-            .add(newsMeta)
-            .addOnSuccessListener {
-                Log.d(
-                    //  javaClass.simpleName,
-                    //  "Note create \"${elipsizeString(note.text)}\" id: ${note.firestoreID}"
-                    "ANBU: ", "calling Create createNewsMetadata addOnSuccessListener"
-                )
-                fetchSavedNews(newsList)
-            }
-            .addOnFailureListener { e ->
-                //  Log.d(javaClass.simpleName, "Note create FAILED \"${elipsizeString(note.text)}\"")
-                Log.d("ANBU: ", "calling Create createNewsMetadata addOnFailureListener")
-                Log.w(javaClass.simpleName, "Error ", e)
+
+    private fun createNewsMetadataUser(email: String){
+        db.collection(rootCollection).document(email)
+            .get()
+            .addOnSuccessListener { doc ->
+                run {
+                    if (doc.exists()) {
+                        Log.d(TAG, "User: $email exists")
+                    } else {
+                        val user = UserSentimentData(email)
+                        db.collection(rootCollection).document(email).set(user)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Successfully added $email")
+                            }
+                            .addOnFailureListener {
+                                Log.d(TAG, "Error while create news : ${it.stackTrace}")
+                            }
+                    }
+                }
             }
     }
 
-    fun removeNewsMetadata(
+    fun createNewsMetadata(email: String,
+                newsMeta: NewsMetaData,
+                newsList: MutableLiveData<List<NewsMetaData>>
+    )
+    {
+        createNewsMetadataUser(email)
+
+        db.collection(rootCollection)
+            .document(email).collection(newsCollection)
+                .add(newsMeta)
+                .addOnSuccessListener {
+                    Log.d(
+                        javaClass.simpleName, "createNewsMetadata is executed successfully"
+                    )
+                    fetchSavedNews(email, newsList)
+                }
+                .addOnFailureListener { e ->
+                    Log.w(javaClass.simpleName, "Error in creating news metadata ", e)
+                }
+    }
+
+
+    fun removeNewsMetadata(email: String,
         newsMeta: NewsMetaData,
         newsList: MutableLiveData<List<NewsMetaData>>
     ) {
         db.collection(rootCollection)
+            .document(email).collection(newsCollection)
             .document(newsMeta.firestoreID)
             .delete()
             .addOnSuccessListener {
                 Log.d(
-                    "ANBU: ", "calling Remove removeNewsMetadata addOnSuccessListener"
+                    javaClass.simpleName, "RemoveNewsMetadata is executed successfully"
                 )
-                fetchSavedNews(newsList)
+                fetchSavedNews(email, newsList)
             }
             .addOnFailureListener { e ->
-                Log.d("ANBU: ", "calling Remove removeNewsMetadata addOnFailureListener")
-                Log.w(javaClass.simpleName, "Error removing news Meta", e)
+                Log.w(javaClass.simpleName, "Error in removing news metadata", e)
             }
     }
 }

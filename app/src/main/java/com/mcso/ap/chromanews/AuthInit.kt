@@ -27,6 +27,7 @@ class AuthInit(viewModel: MainViewModel, signInLauncher: ActivityResultLauncher<
         } else {
             Log.d(TAG, "User: ${user.displayName}")
             viewModel.updateUser()
+            viewModel.bookmarkListEmpty()
         }
     }
 }

@@ -66,7 +66,7 @@ class MainViewModel(): ViewModel() {
     }
 
     fun fetchSavedNewsList() {
-        savednewsDataDB.fetchSavedNews(savedNewsList)
+        getCurrentUser()?.let { savednewsDataDB.fetchSavedNews(it, savedNewsList) }
     }
 
     fun observeSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
@@ -74,7 +74,10 @@ class MainViewModel(): ViewModel() {
     }
 
     fun getSavedNewsCount(): Int? {
-        return savedNewsList.value?.size
+        if (savedNewsList.value?.isNotEmpty() == true){
+            return savedNewsList.value!!.size
+        }
+        return 0
     }
 
     fun getNewsMeta(position: Int) : NewsMetaData {
@@ -94,7 +97,7 @@ class MainViewModel(): ViewModel() {
             pubDate = pubDate,
             firestoreID = ""
         )
-        savednewsDataDB.createNewsMetadata(newsMeta, savedNewsList)
+        getCurrentUser()?.let { savednewsDataDB.createNewsMetadata(it, newsMeta, savedNewsList) }
     }
 
     fun getSavedNewsList(): MutableLiveData<List<NewsMetaData>> {
@@ -111,7 +114,7 @@ class MainViewModel(): ViewModel() {
                 break
             }
         }
-        savednewsDataDB.removeNewsMetadata(news, savedNewsList)
+        getCurrentUser()?.let { savednewsDataDB.removeNewsMetadata(it, news, savedNewsList) }
         if (newsPost != null) {
             removeFav(newsPost)
         }
@@ -134,7 +137,6 @@ class MainViewModel(): ViewModel() {
         firebaseAuthLiveData.logout()
     }
 
-    private var searchTerm: MutableLiveData<String> = MutableLiveData("")
     var fetchDone : MutableLiveData<Boolean> = MutableLiveData(false)
 
     var fetchList = MediatorLiveData<List<NewsPost>>().apply {
@@ -146,9 +148,8 @@ class MainViewModel(): ViewModel() {
         value = mutableListOf()
     }
 
-    // setting search term
-    fun setSearchTerm(s: String) {
-        searchTerm.value = s
+    fun bookmarkListEmpty(){
+        favPostsList.value = mutableListOf()
     }
 
     init{
@@ -189,7 +190,7 @@ class MainViewModel(): ViewModel() {
             it.add(albumRec)
             favPostsList.value = it
         }
-        Log.d("ANBU addFav ", favPostsList.value.toString())
+        Log.d("addFav ", favPostsList.value.toString())
     }
 
     // Convenient place to put it as it is shared

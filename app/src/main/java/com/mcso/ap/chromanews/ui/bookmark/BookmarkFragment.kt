@@ -45,6 +45,7 @@ class BookmarkFragment : Fragment() {
             viewModel.fetchSavedNewsList()
             adapter.notifyDataSetChanged()
             viewModel.fetchDone.value = false
+            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         viewModel.observeSavedNewsList().observe(viewLifecycleOwner) {

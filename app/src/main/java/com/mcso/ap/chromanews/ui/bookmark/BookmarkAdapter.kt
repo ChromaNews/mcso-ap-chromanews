@@ -17,14 +17,12 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
         val TAG = "BookmarkAdapter"
     }
 
-    var searchText: String = ""
-    var booklist: List<NewsMetaData>? = null
-
     private fun getPos(holder: RecyclerView.ViewHolder): Int {
         val pos = holder.adapterPosition
 
         if (pos == RecyclerView.NO_POSITION) {
-            return holder.adapterPosition
+
+            return RecyclerView.NO_POSITION
         }
         return pos
     }
@@ -60,13 +58,7 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
 
         val binding = holder.rowBinding
 
-        if (searchText.isNotBlank()){
-            val highlightedText = item.title.replace(searchText, "<font color='red'>$searchText</font>", true)
-            binding.title.text = HtmlCompat.fromHtml(highlightedText, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        }
-        else{
-            binding.title.text = item.title
-        }
+        binding.title.text = item.title
 
         binding.description.text = item.description
         // binding.authors.text = item.authors
@@ -88,5 +80,4 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
                     && oldItem.newsID == newItem.newsID
         }
     }
-
 }
