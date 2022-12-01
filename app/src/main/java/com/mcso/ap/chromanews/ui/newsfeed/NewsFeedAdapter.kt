@@ -104,7 +104,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         binding.PubdateVal.setTextColor(Color.BLACK)
         binding.description.setTextColor(Color.BLACK)
         binding.authors.text = item.author
-        binding.authors.setTextColor(Color.GREEN)
+        binding.authors.setTextColor(Color.BLUE)
 
         if (item.imageURL != null){
             Glide.glideFetch(item.imageURL, null, binding.image)

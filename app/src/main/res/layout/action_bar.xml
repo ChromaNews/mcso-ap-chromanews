@@ -15,4 +15,18 @@
             android:textStyle="bold"
             android:text="@string/app_name"/>
 
+
+    <EditText
+        android:id="@+id/actionSearch"
+        android:layout_width="0dp"
+        android:minEms="16"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:layout_margin="8dp"
+        android:layout_gravity="end|center_vertical"
+        android:hint="search"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:padding="8dp" />
+
 </LinearLayout>

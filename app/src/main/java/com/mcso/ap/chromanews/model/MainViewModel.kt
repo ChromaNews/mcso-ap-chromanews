@@ -2,16 +2,19 @@ package com.mcso.ap.chromanews.model
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import androidx.lifecycle.*
-import com.google.firebase.auth.FirebaseAuth
 import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
 import com.mcso.ap.chromanews.model.api.SentimentData
 import com.mcso.ap.chromanews.model.auth.FirebaseUserLiveData
 import com.mcso.ap.chromanews.model.conflict.Conflicts
 import com.mcso.ap.chromanews.model.conflict.ConflictsResponse
-import com.mcso.ap.chromanews.model.sentiment.SentimentColor
+import androidx.core.text.clearSpans
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.mcso.ap.chromanews.db.NewsDBHelper
@@ -21,6 +24,9 @@ import com.mcso.ap.chromanews.ui.ReadNews
 class MainViewModel(): ViewModel() {
 
     private val TAG = "MainViewModel"
+
+    private var searchTerm: MutableLiveData<String> = MutableLiveData("")
+    private var title = MutableLiveData<String>()
 
     // Firebase
     private val firebaseAuthLiveData = FirebaseUserLiveData()
@@ -50,7 +56,9 @@ class MainViewModel(): ViewModel() {
 
     // for bookmarked news
     private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
-    private var savedNewsList = MutableLiveData<List<NewsMetaData>>()
+    private var savedNewsList = MediatorLiveData<List<NewsMetaData>>().apply {
+        value = mutableListOf()
+    }
 
     fun getFeedForCategory(){
         viewModelScope.launch (
@@ -289,5 +297,55 @@ class MainViewModel(): ViewModel() {
 
     fun observeShowProgress(): LiveData<Boolean> {
         return showProgress
+    }
+
+    // Search functionalities
+    fun setSearchTerm(s: String) {
+        searchTerm.value = s
+    }
+
+    private fun setSpan(fulltext: SpannableString, subtext: String): Boolean {
+        if( subtext.isEmpty() ) return true
+        val i = fulltext.indexOf(subtext, ignoreCase = true)
+        if( i == -1 ) return false
+        fulltext.setSpan(
+            ForegroundColorSpan(Color.BLUE), i, i + subtext.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return true
+    }
+
+    private fun removeAllCurrentSpans(){
+        fetchList.value?.forEach {
+            SpannableString(it.title).clearSpans()
+        }
+    }
+
+    private fun filterList(): List<NewsPost> {
+        Log.d(javaClass.simpleName,
+            "Filter $searchTerm Q(${title.value})")
+
+        removeAllCurrentSpans()
+
+        val searchTermValue = searchTerm.value!!
+
+        Log.d("Filter Searchterm", searchTermValue)
+        return fetchList.value!!.filter {
+            var titleFound = false
+            titleFound = setSpan(SpannableString(it.title), searchTermValue)
+
+            titleFound
+        }
+    }
+
+    private var searchPosts = MediatorLiveData<List<NewsPost>>().apply {
+        addSource(fetchList)  { value = filterList() }
+        addSource(searchTerm)  { value = filterList() }
+
+        value = fetchList.value
+    }
+
+    fun observeSearchPostLiveData(): LiveData<List<NewsPost>>{
+        return searchPosts
     }
 }

@@ -3,11 +3,10 @@ package com.mcso.ap.chromanews.ui.newsfeed
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mcso.ap.chromanews.R
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
 import com.mcso.ap.chromanews.model.MainViewModel
 
@@ -15,30 +14,21 @@ import com.mcso.ap.chromanews.model.MainViewModel
 class BusinessFragment: Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentRvBinding? = null
-
-    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
-
-    companion object {
-        fun newInstance(): BusinessFragment {
-            Log.d("ANBU: ", "instance")
-            return BusinessFragment()
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(javaClass.simpleName, " ANBU NewsFeedFragment onCreateView")
+        Log.d(javaClass.simpleName, "BusinessFragment onCreateView")
         _binding = FragmentRvBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(javaClass.simpleName, "ANBU BusinessFragment onViewCreated")
+        Log.d(javaClass.simpleName, "BusinessFragment onViewCreated")
 
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         val adapter = NewsFeedAdapter(viewModel)
@@ -56,6 +46,13 @@ class BusinessFragment: Fragment() {
         viewModel.fetchDone.observe(viewLifecycleOwner) {
             binding.swipeRefreshLayout.isRefreshing = false
         }
+
+        viewModel.observeSearchPostLiveData().observe(viewLifecycleOwner,
+            Observer { filterList ->
+                adapter.submitList(filterList)
+                adapter.notifyDataSetChanged()
+            }
+        )
     }
 
     override fun onDestroyView() {

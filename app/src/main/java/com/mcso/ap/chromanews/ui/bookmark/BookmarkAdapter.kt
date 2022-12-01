@@ -2,7 +2,6 @@ package com.mcso.ap.chromanews.ui.bookmark
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -79,5 +78,9 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
             return oldItem.firestoreID == newItem.firestoreID
                     && oldItem.newsID == newItem.newsID
         }
+    }
+
+    override fun getItemCount(): Int {
+        return viewModel.getSavedNewsCount()!!
     }
 }

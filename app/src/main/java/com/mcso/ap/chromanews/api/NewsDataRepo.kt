@@ -1,7 +1,5 @@
 package com.mcso.ap.chromanews.api
 
-import android.util.Log
-
 class NewsDataRepo(private val api: NewsDataApi) {
 
     private fun unpackPosts(response: NewsDataApi.NewsDataResponse): List<NewsPost> {
