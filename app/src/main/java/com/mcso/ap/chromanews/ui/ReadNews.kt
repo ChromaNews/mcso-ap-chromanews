@@ -3,6 +3,7 @@ package com.mcso.ap.chromanews.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
@@ -10,15 +11,18 @@ import android.webkit.WebViewClient
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.widget.ProgressBar
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.mcso.ap.chromanews.R
 import com.mcso.ap.chromanews.databinding.ActivityReadNewsBinding
+import com.mcso.ap.chromanews.model.MainViewModel
 
 
 class ReadNews : AppCompatActivity() {
 
     private lateinit var newsWebView: WebView
     private lateinit var progressBar: ProgressBar
+    private val viewModel: MainViewModel by viewModels()
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +62,22 @@ class ReadNews : AppCompatActivity() {
 
         if (bundle?.getString("linkKey") != null) {
             newsWebView.loadUrl(bundle?.getString("linkKey")!!)
+        }
+
+        // Analyze news sentiment
+        bundle?.getString("titleKey")?.let {
+            Log.d("TAG", "analyzing news: ${bundle?.getString("titleKey")}")
+            viewModel.netAnalyzeNews(it)
+        }
+
+        // update sentiment to DB
+        viewModel.observeSentimentScore().observe(this) { sentimentData ->
+            run {
+                val score = String.format(
+                    "%.6f", sentimentData.score.toDouble()
+                ).toDouble()
+                viewModel.updateUserSentiment(score)
+            }
         }
 
         newsWebView.webViewClient = object : WebViewClient() {

@@ -104,7 +104,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         binding.PubdateVal.setTextColor(Color.BLACK)
         binding.description.setTextColor(Color.BLACK)
         binding.authors.text = item.author
-        binding.authors.setTextColor(Color.GREEN)
+        binding.authors.setTextColor(Color.BLUE)
 
         if (item.imageURL != null){
             Glide.glideFetch(item.imageURL, null, binding.image)
@@ -130,10 +130,10 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             binding.bookmarkFav.setImageResource(R.drawable.baseline_bookmark_border_24)
         }
 
-        binding.title.setOnClickListener {
-            Log.d(TAG, "analyzing news: $it")
+        /*binding.title.setOnClickListener {
+            Log.d(TAG, "analyzing news: ${item.title}")
             viewModel.netAnalyzeNews(item.title)
-        }
+        }*/
     }
 
 

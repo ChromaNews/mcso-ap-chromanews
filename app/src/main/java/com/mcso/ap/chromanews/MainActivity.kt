@@ -1,6 +1,7 @@
 package com.mcso.ap.chromanews
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -30,13 +31,12 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager2: ViewPager2
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels()
     private var actionBarBinding: ActionBarBinding? = null
+    private val viewModel: MainViewModel by viewModels()
     private val titles = ArrayList<String>()
 
     companion object {
         private val TAG = "MainActivity"
-        private const val mainFragTag = "mainFragTag"
     }
 
     // call back once log signInIntent is completed in AuthInit()
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
             result ->
         run {
             if (result.resultCode == Activity.RESULT_OK) {
-                // viewModel.updateUser()
+                viewModel.updateUser()
             } else {
                 Log.e(MainActivity.TAG, "User login failed")
             }
@@ -62,12 +62,13 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         actionBarBinding!!.actionSearch.isVisible = false
     }
 
-        override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         actionBarBinding = ActionBarBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.let{
             initActionBar(it)
@@ -124,8 +125,8 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
                     }
                 }
             }
-           override fun onTabUnselected(tab: TabLayout.Tab) {}
-           override fun onTabReselected(tab: TabLayout.Tab) {}
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
         actionBarBinding?.actionSearch?.addTextChangedListener(object : TextWatcher {
@@ -140,6 +141,13 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
                 viewModel.setSearchTerm(s.toString())
             }
         })
+
+        // trigger sentiment rate calculation once user logs on
+        viewModel.observeUserName().observe(this){
+            if (viewModel.getCurrentUser() != null){
+                viewModel.calculateRating()
+            }
+        }
     }
 
     private fun showDialog(){
@@ -148,8 +156,14 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         alertDialog.setMessage("Are you sure you want to logout?")
         alertDialog.setPositiveButton("yes") { _, _ ->
             Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
+
             viewModel.logoutUser()
             AuthInit(viewModel,signInLauncher)
+
+            // clear activity that triggers in launching AuthUI
+            val intent = Intent(this, MainActivity::class.java);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
         alertDialog.setNegativeButton("No") { _, _ -> }
         val alert: AlertDialog = alertDialog.create()

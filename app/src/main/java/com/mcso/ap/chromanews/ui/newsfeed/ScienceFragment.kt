@@ -47,9 +47,6 @@ class ScienceFragment: Fragment() {
         binding.recyclerRVView.adapter = adapter
 
         viewModel.observeLiveData().observe(viewLifecycleOwner) {
-            // adapter.submitList(it){
-            //     binding.recyclerRVView.scrollToPosition(0)
-            // }
             adapter.submitList(it)
             adapter.notifyDataSetChanged()
         }
