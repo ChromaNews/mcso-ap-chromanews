@@ -16,13 +16,6 @@ class BusinessFragment: Fragment() {
     private var _binding: FragmentRvBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        fun newInstance(): BusinessFragment {
-            Log.d("BusinessFragment", "instance")
-            return BusinessFragment()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

@@ -16,19 +16,12 @@ class TechnologyFragment: Fragment() {
     private var _binding: FragmentRvBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        fun newInstance(): TechnologyFragment {
-            Log.d("TechnologyFragment", "instance")
-            return TechnologyFragment()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(javaClass.simpleName, "TechnologyFragment onCreateView")
+        Log.d(javaClass.simpleName, "onCreateView")
         _binding = FragmentRvBinding.inflate(inflater, container, false)
         return binding.root
     }

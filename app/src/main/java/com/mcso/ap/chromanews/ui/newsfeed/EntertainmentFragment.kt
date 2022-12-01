@@ -16,13 +16,6 @@ class EntertainmentFragment: Fragment() {
     private var _binding: FragmentRvBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        fun newInstance(): EntertainmentFragment {
-            Log.d("EntertainmentFragment", "instance")
-            return EntertainmentFragment()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

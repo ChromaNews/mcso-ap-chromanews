@@ -16,13 +16,6 @@ class HealthFragment: Fragment() {
     private var _binding: FragmentRvBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        fun newInstance(): HealthFragment {
-            Log.d("HealthFragment: ", "instance")
-            return HealthFragment()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
