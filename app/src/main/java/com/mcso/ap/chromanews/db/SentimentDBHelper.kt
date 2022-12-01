@@ -109,13 +109,10 @@ class SentimentDBHelper {
                     run {
                         var totalRate: Double = 0.0
                         if (doc.exists()) {
-                            Log.d(TAG, "adding rates on ${doc.id}")
                             val ratingDate = doc.toObject(RatingDate::class.java)
-                            Log.d(TAG, "date: ${ratingDate?.date}")
                             ratingDate?.rateList?.forEach{
-                                rate ->
+                                    rate ->
                                 run {
-                                    Log.d(TAG, "rate: $rate")
                                     totalRate += rate
                                 }
                             }

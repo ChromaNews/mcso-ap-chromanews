@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.databinding.FragmentMoodColorBinding
+import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import java.util.*
 import kotlin.math.abs
@@ -37,15 +37,18 @@ class MoodColorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        binding.welcome.text = viewModel.getCurrentUserName()?.let { getWelcomeText(it) }
-
-
         val explanation = "We watch and discuss news with friends and family. " +
                 "Each information we read and think has an impact on our mindset. " +
                 "Imagine if we could understand how what we watch and read can also tell us how it impacts us, " +
                 "everytime!"
         binding.explanation.text = explanation
+
+        // default to green
+        Log.d(TAG, "setting default color")
+        val defaultColor = Color.parseColor("#00FF00")
+        binding.colorCode.setTextColor(Color.parseColor("#FFFFFF"))
+        binding.colorCode.setBackgroundColor(defaultColor)
+        binding.moodColor.setColorFilter(defaultColor)
 
         viewModel.observeRatingByDate().observe(viewLifecycleOwner){
             calculateSentimentColorCode(it)
@@ -67,19 +70,13 @@ class MoodColorFragment : Fragment() {
             // mind color
             binding.moodColor.setColorFilter(hexMoodColor)
         }
-
-        // default to green
-        Log.d(TAG, "setting default color")
-        val defaultColor = Color.parseColor("#00FF00")
-        binding.colorCode.setTextColor(Color.parseColor("#FFFFFF"))
-        binding.colorCode.setBackgroundColor(defaultColor)
-        binding.moodColor.setColorFilter(defaultColor)
     }
 
     override fun setMenuVisibility(menuVisible: Boolean) {
         super.setMenuVisibility(menuVisible)
         if (viewModel.getCurrentUser() != null){
             if (view != null && menuVisible){
+                binding.welcome.text = getWelcomeText(viewModel.getCurrentUserName()!!)
                 viewModel.calculateRating()
             }
         }
@@ -99,7 +96,7 @@ class MoodColorFragment : Fragment() {
     private fun calculateSentimentColorCode(ratingByDate: List<Double>){
         val sentimentValue = (ratingByDate.sum() / ratingByDate.size)
         Log.d(TAG, "total rating: $sentimentValue")
-        
+
         var helpText = "You are "
         when (sentimentValue){
             in 0.01..1.0 -> {
