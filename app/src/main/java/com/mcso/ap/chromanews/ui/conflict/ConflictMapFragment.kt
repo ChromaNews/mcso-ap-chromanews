@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
@@ -148,8 +149,16 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             val markerLocation = it
             val markerLat = markerLocation.latitude
             val markerLong = markerLocation.longitude
-            val addressList = geocoder.getFromLocation(markerLat, markerLong, 1)
-            if (!addressList.isNullOrEmpty()){
+            var addressList = emptyList<Address>()
+
+            try {
+                // handling failures... gracefully (!?)
+                addressList = geocoder.getFromLocation(markerLat, markerLong, 1)
+            } catch (e: Exception){
+                Log.e(TAG, "Exception while identifying selected location: ${e.message}")
+            }
+
+            if (addressList.isNotEmpty()){
                 val countryName = addressList[0].countryName
                 Log.d(TAG, "Country Selected: $countryName")
                 Toast.makeText(requireContext(), "Fetching conflicts in $countryName", Toast.LENGTH_LONG).show()
