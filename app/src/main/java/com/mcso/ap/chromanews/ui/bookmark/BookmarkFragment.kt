@@ -16,7 +16,6 @@ class BookmarkFragment : Fragment() {
 
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
-        // private val viewModel: MainViewModel by viewModels()
     private var bookmarkadapter: BookmarkAdapter? = null
     private val tempList: ArrayList<NewsMetaData> = ArrayList()
 

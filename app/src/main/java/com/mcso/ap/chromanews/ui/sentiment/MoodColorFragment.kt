@@ -70,13 +70,6 @@ class MoodColorFragment : Fragment() {
             // mind color
             binding.moodColor.setColorFilter(hexMoodColor)
         }
-
-        defaultColor = Color.parseColor("#008000")
-
-        // default to green
-        binding.colorCode.setTextColor(Color.parseColor("#FFFFFF"))
-        binding.colorCode.setBackgroundColor(defaultColor)
-        binding.moodColor.setColorFilter(defaultColor)
     }
 
     override fun setMenuVisibility(menuVisible: Boolean) {

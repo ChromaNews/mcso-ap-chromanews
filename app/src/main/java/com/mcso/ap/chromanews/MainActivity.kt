@@ -158,7 +158,6 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
             Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
 
             viewModel.logoutUser()
-            AuthInit(viewModel,signInLauncher)
 
             // clear activity that triggers in launching AuthUI
             val intent = Intent(this, MainActivity::class.java);
