@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.*
+import com.google.firebase.auth.FirebaseAuth
 import com.mcso.ap.chromanews.api.*
 import com.mcso.ap.chromanews.db.SentimentDBHelper
 import com.mcso.ap.chromanews.model.api.SentimentData
@@ -23,6 +24,7 @@ class MainViewModel(): ViewModel() {
 
     // Firebase
     private val firebaseAuthLiveData = FirebaseUserLiveData()
+    private val currentUserName = MutableLiveData("anonymous")
 
     // NewsData repo and api
     private var category = "business"
@@ -121,8 +123,13 @@ class MainViewModel(): ViewModel() {
     }
 
     // update firebase user
+    fun observeUserName(): LiveData<String>{
+        return currentUserName
+    }
+
     fun updateUser(){
         firebaseAuthLiveData.updateUser()
+        currentUserName.postValue(firebaseAuthLiveData.getName())
     }
 
     fun getCurrentUser(): String?{
@@ -270,7 +277,7 @@ class MainViewModel(): ViewModel() {
     fun getConflictForLocation(markerLocation: String): Conflicts? {
         var conflictInfo: Conflicts? = null
         val conflicts: List<Conflicts>? = conflictLiveData.value?.conflictList?.filter {
-            conflicts -> conflicts.location == markerLocation
+                conflicts -> conflicts.location == markerLocation
         }
 
         if (conflicts != null && conflicts.isNotEmpty()) {

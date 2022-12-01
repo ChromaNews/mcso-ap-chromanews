@@ -1,6 +1,7 @@
 package com.mcso.ap.chromanews
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.FrameLayout
@@ -10,6 +11,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -99,9 +102,16 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
                     }
                 }
             }
-           override fun onTabUnselected(tab: TabLayout.Tab) {}
-           override fun onTabReselected(tab: TabLayout.Tab) {}
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
         })
+
+        // trigger sentiment rate calculation once user logs on
+        viewModel.observeUserName().observe(this){
+            if (viewModel.getCurrentUser() != null){
+                viewModel.calculateRating()
+            }
+        }
     }
 
     private fun showDialog(){
@@ -110,8 +120,14 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         alertDialog.setMessage("Are you sure you want to logout?")
         alertDialog.setPositiveButton("yes") { _, _ ->
             Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
+
+            // sign out from firebase
             viewModel.logoutUser()
-            AuthInit(viewModel,signInLauncher)
+
+            // clear activity that triggers in launching AuthUI
+            val intent = Intent(this, MainActivity::class.java);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
         alertDialog.setNegativeButton("No") { _, _ -> }
         val alert: AlertDialog = alertDialog.create()
