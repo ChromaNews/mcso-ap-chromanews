@@ -67,7 +67,7 @@ class MainViewModel(): ViewModel() {
                     + Dispatchers.IO)
         {
             Log.d(TAG, "fetching news feed for [${category}]")
-            fetchList.postValue(newsDataRepo.getNews(category))
+            newsList.postValue(newsDataRepo.getNews(category))
             fetchDone.postValue(true)
         }
     }
@@ -119,7 +119,7 @@ class MainViewModel(): ViewModel() {
         val news = getNewsMeta(position)
         var newsPost: NewsPost? = null
 
-        for (item in favPostsList.value!!){
+        for (item in bookmarkPostsList.value!!){
             if (item.title == news.title){
                 newsPost = item
                 break
@@ -155,17 +155,21 @@ class MainViewModel(): ViewModel() {
 
     var fetchDone : MutableLiveData<Boolean> = MutableLiveData(false)
 
-    var fetchList = MediatorLiveData<List<NewsPost>>().apply {
+    var newsList = MediatorLiveData<List<NewsPost>>().apply {
         value = mutableListOf()
     }
 
+    /**
+     * BEGIN BOOKMARK SECTION
+     */
+
     // handling bookmarks
-    private var favPostsList = MutableLiveData<List<NewsPost>>().apply{
+    private var bookmarkPostsList = MutableLiveData<List<NewsPost>>().apply{
         value = mutableListOf()
     }
 
     fun bookmarkListEmpty(){
-        favPostsList.value = mutableListOf()
+        bookmarkPostsList.value = mutableListOf()
     }
 
     init{
@@ -173,26 +177,26 @@ class MainViewModel(): ViewModel() {
     }
 
     fun observeLiveData(): LiveData<List<NewsPost>> {
-        return fetchList
+        return newsList
     }
 
     fun removeFav(albumRec: NewsPost) {
-        val localList = favPostsList.value?.toMutableList()
+        val localList = bookmarkPostsList.value?.toMutableList()
         localList?.let {
             it.remove(albumRec)
-            favPostsList.value = it
+            bookmarkPostsList.value = it
         }
     }
 
 
     fun isFav(albumRec: NewsPost): Boolean {
-        var fav =  favPostsList.value?.contains(albumRec) ?: false
+        var fav =  bookmarkPostsList.value?.contains(albumRec) ?: false
         return fav
     }
 
 
     fun getItemAt(position: Int) : NewsPost? {
-        val localList = fetchList.value?.toList()
+        val localList = newsList.value?.toList()
         localList?.let {
             if( position >= it.size ) return null
             return it[position]
@@ -201,36 +205,40 @@ class MainViewModel(): ViewModel() {
     }
 
     fun addFav(albumRec: NewsPost) {
-        val localList = favPostsList.value?.toMutableList()
+        val localList = bookmarkPostsList.value?.toMutableList()
         localList?.let {
             it.add(albumRec)
-            favPostsList.value = it
+            bookmarkPostsList.value = it
         }
-        Log.d("addFav ", favPostsList.value.toString())
     }
 
-    companion object {
-        fun doOnePost(context: Context, newsPost: NewsPost) {
-            val onePostIntent = Intent(context, ReadNews::class.java)
 
-            onePostIntent.putExtra("titleKey", newsPost.title.toString())
-            onePostIntent.putExtra("descKey", newsPost.description.toString())
-            onePostIntent.putExtra("imageKey", newsPost.imageURL)
-            onePostIntent.putExtra("linkKey", newsPost.link)
-            onePostIntent.putExtra("dateKey", newsPost.pubDate)
-            onePostIntent.putExtra("authorKey", newsPost.author.toString())
-            context.startActivity(onePostIntent)
+    /**
+     * BEGIN READ NEWS SECTION
+     */
+
+    companion object {
+        fun readNewsPost(context: Context, newsPost: NewsPost) {
+            val readNewsIntent = Intent(context, ReadNews::class.java)
+
+            readNewsIntent.putExtra("titleKey", newsPost.title)
+            readNewsIntent.putExtra("descKey", newsPost.description.toString())
+            readNewsIntent.putExtra("imageKey", newsPost.imageURL)
+            readNewsIntent.putExtra("linkKey", newsPost.link)
+            readNewsIntent.putExtra("dateKey", newsPost.pubDate)
+            readNewsIntent.putExtra("authorKey", newsPost.author.toString())
+            context.startActivity(readNewsIntent)
         }
 
         fun openSavedNewsPost(context: Context, newsPost: NewsMetaData) {
-            val onePostIntent = Intent(context, ReadNews::class.java)
+            val readNewsIntent = Intent(context, ReadNews::class.java)
 
-            onePostIntent.putExtra("titleKey", newsPost.title.toString())
-            onePostIntent.putExtra("descKey", newsPost.description.toString())
-            onePostIntent.putExtra("imageKey", newsPost.imageURL)
-            onePostIntent.putExtra("linkKey", newsPost.link)
-            onePostIntent.putExtra("dateKey", newsPost.pubDate)
-            context.startActivity(onePostIntent)
+            readNewsIntent.putExtra("titleKey", newsPost.title)
+            readNewsIntent.putExtra("descKey", newsPost.description)
+            readNewsIntent.putExtra("imageKey", newsPost.imageURL)
+            readNewsIntent.putExtra("linkKey", newsPost.link)
+            readNewsIntent.putExtra("dateKey", newsPost.pubDate)
+            context.startActivity(readNewsIntent)
         }
     }
 
@@ -310,7 +318,11 @@ class MainViewModel(): ViewModel() {
         return showProgress
     }
 
-    // Search functionalities
+    /**
+     * BEGIN SEARCH SECTION
+     */
+
+    // Set search string
     fun setSearchTerm(s: String) {
         searchTerm.value = s
     }
@@ -327,7 +339,7 @@ class MainViewModel(): ViewModel() {
     }
 
     private fun removeAllCurrentSpans(){
-        fetchList.value?.forEach {
+        newsList.value?.forEach {
             SpannableString(it.title).clearSpans()
         }
     }
@@ -340,7 +352,7 @@ class MainViewModel(): ViewModel() {
 
         val searchTermValue = searchTerm.value!!
 
-        return fetchList.value!!.filter {
+        return newsList.value!!.filter {
             var titleFound = false
             titleFound = setSpan(SpannableString(it.title), searchTermValue)
 
@@ -349,10 +361,10 @@ class MainViewModel(): ViewModel() {
     }
 
     private var searchPosts = MediatorLiveData<List<NewsPost>>().apply {
-        addSource(fetchList)  { value = filterList() }
+        addSource(newsList)  { value = filterList() }
         addSource(searchTerm)  { value = filterList() }
 
-        value = fetchList.value
+        value = newsList.value
     }
 
     fun observeSearchPostLiveData(): LiveData<List<NewsPost>>{

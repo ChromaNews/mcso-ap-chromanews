@@ -30,7 +30,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
 
             rowPostBinding.root.setOnClickListener {
                 var item = getItem(adapterPosition)
-                MainViewModel.doOnePost(rowPostBinding.root.context, item)
+                MainViewModel.readNewsPost(rowPostBinding.root.context, item)
             }
 
             rowPostBinding.share.setOnClickListener {
