@@ -37,6 +37,7 @@ import com.mcso.ap.chromanews.databinding.FragmentConflictMapBinding
 import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.conflict.Conflicts
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
+import com.mcso.ap.chromanews.ui.SentimentUtil
 import kotlin.math.abs
 
 class ConflictMapFragment : Fragment(), OnMapReadyCallback {
@@ -56,6 +57,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     private val conflictDetailsBinding get() = _conflictDetailsBinding
     private lateinit var _conflictDetailsBinding: ConflictDetailsBinding
 
+    private val sentimentUtil = SentimentUtil()
     private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
 
     private lateinit var locationService: FusedLocationProviderClient
@@ -148,7 +150,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         }
         conflictsMap.setOnMapClickListener {
 
-            // hide layout
+            // hide details layout
             conflictDetailsBinding.conflictDetails.visibility = View.GONE
 
             val markerLocation = it
@@ -220,7 +222,11 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                     ).toDouble()
                     val sentimentScore = "Sentiment Score: $score"
                     conflictDetailsBinding.conflictSentiment.text = sentimentScore
-                    conflictDetailsBinding.conflictSentiment.setBackgroundColor(Color.parseColor(getSentimentColorInHex()))
+                    conflictDetailsBinding.conflictSentiment.setBackgroundColor(
+                        Color.parseColor(
+                            sentimentUtil.getSentimentColorInHex(sentimentColor)
+                        )
+                    )
                 }
             }
         }
@@ -228,42 +234,14 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
     private fun calculateSentimentColorCode(sentimentScore: Double){
         when (sentimentScore){
-            in 0.01..1.0 -> {
-                Log.d(TAG, "Positive Sentiment value = $sentimentScore")
-                calculatePositiveColor(sentimentScore)
-            }
-            in -1.0..-0.01 -> {
-                Log.d(TAG, "Negative Sentiment value = $sentimentScore")
-                calculateNegativeColor(sentimentScore)
-            }
+            in 0.01..1.0 -> sentimentColor = sentimentUtil.calculatePositiveColor(sentimentScore)
+            in -1.0..-0.01 -> sentimentColor = sentimentUtil.calculateNegativeColor(sentimentScore)
             else -> {
-                Log.d(TAG, "Neutral Sentiment value = $sentimentScore")
+                // do nothing, default is green
             }
         }
+        Log.d(TAG, "Conflict Sentiment value = $sentimentScore")
         Log.d(TAG, "mood color: [${sentimentColor.red}, ${sentimentColor.green}, ${sentimentColor.blue}]")
-    }
-
-    private fun calculateNegativeColor(sentimentNum: Double){
-        val red = (abs(sentimentNum) * 255).toInt()
-        val green = abs((1 + sentimentNum) * 255).toInt()
-        sentimentColor = SentimentColor(red, green, 0)
-    }
-
-    private fun calculatePositiveColor(sentimentNum: Double){
-        val blue = (abs(sentimentNum) * 255).toInt()
-        val green = abs((1 - sentimentNum) * 255).toInt()
-        sentimentColor = SentimentColor(0, green, blue)
-    }
-
-    private fun getSentimentColorInHex(): String {
-        val rHex = getHexCode(sentimentColor.red)
-        val gHex = getHexCode(sentimentColor.green)
-        val bHex = getHexCode(sentimentColor.blue)
-        return "#$rHex$gHex$bHex"
-    }
-
-    private fun getHexCode(intColorCode: Int): String {
-        return Integer.toHexString(intColorCode).padStart(2, '0')
     }
 
     @SuppressLint("SetTextI18n")
