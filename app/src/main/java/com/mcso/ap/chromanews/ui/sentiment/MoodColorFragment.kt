@@ -13,7 +13,6 @@ import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import com.mcso.ap.chromanews.ui.SentimentUtil
 import java.util.*
-import kotlin.math.abs
 
 class MoodColorFragment : Fragment() {
 
@@ -23,10 +22,10 @@ class MoodColorFragment : Fragment() {
 
     private lateinit var _binding: FragmentMoodColorBinding
     private val viewModel: MainViewModel by viewModels()
-    private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
-    private lateinit var sentimentType: String
     private val binding get() = _binding
 
+    private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
+    private lateinit var sentimentType: String
     private val sentimentUtil = SentimentUtil()
 
     // color codes
@@ -58,6 +57,7 @@ class MoodColorFragment : Fragment() {
         binding.colorCode.setBackgroundColor(defaultColor)
         binding.moodColor.setColorFilter(defaultColor)
 
+        // Observe and update mood when new sentiment data is posted
         viewModel.observeRatingByDate().observe(viewLifecycleOwner){
             calculateSentimentColorCode(it)
             val sentimentHexColorCode = sentimentUtil.getSentimentColorInHex(sentimentColor)
@@ -80,6 +80,10 @@ class MoodColorFragment : Fragment() {
         }
     }
 
+
+    /**
+     * calculate sentiment score when fragment becomes visible
+     */
     override fun setMenuVisibility(menuVisible: Boolean) {
         super.setMenuVisibility(menuVisible)
         if (viewModel.getCurrentUser() != null){
@@ -90,6 +94,24 @@ class MoodColorFragment : Fragment() {
         }
     }
 
+    /**
+     * Calculate average rating for all dates
+     * -1 to -0.01 is negative
+     * 0 is neutral
+     * 0.01 to 1 is positive
+     *
+     * RGB = convert the rating value to RGB code
+     * - positive is a mix of Green and Blue
+     * - Negative is a mix of Green and Red
+     * - Neutral is Green
+     *
+     * The help text
+     * > 0.01  to < 0.5 -> You are on the positive side. Keep going!
+     * > 0.5 to 1 -> You are very positive. Great job!
+     * > -0.5 to 0.01 -> You are on the negative side. *shrugs*
+     * -1 to <= -0.5 -> You are in the danger zone! Red alert!
+     * 0 -> You are in the sweet spot! Read more!
+     */
     private fun calculateSentimentColorCode(ratingByDate: List<Double>){
         val sentimentValue = (ratingByDate.sum() / ratingByDate.size)
         Log.d(TAG, "total rating: $sentimentValue")
@@ -110,7 +132,7 @@ class MoodColorFragment : Fragment() {
                 helpText += if (sentimentValue > -0.5){
                     "on the negative side. *shrug*"
                 } else {
-                    "very negative! alert!"
+                    "the danger zone! Red alert!"
                 }
                 sentimentColor = sentimentUtil.calculateNegativeColor(sentimentValue)
             }

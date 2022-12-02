@@ -38,7 +38,6 @@ import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.conflict.Conflicts
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
 import com.mcso.ap.chromanews.ui.SentimentUtil
-import kotlin.math.abs
 
 class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
@@ -46,21 +45,26 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         private val TAG = "ConflictMapFragment"
     }
 
-    private val acledLink: String = "https://www.acleddata.com"
+    // bindings
     private var _binding: FragmentConflictMapBinding? = null
-    private lateinit var conflictsMap: GoogleMap
-    private lateinit var geocoder: Geocoder
-    private lateinit var progressBar: ProgressBar
-    private var locationPermissionGranted = false
-    private val viewModel: MainViewModel by viewModels()
     private val binding get() = _binding!!
     private val conflictDetailsBinding get() = _conflictDetailsBinding
     private lateinit var _conflictDetailsBinding: ConflictDetailsBinding
 
+    // For the map
+    private lateinit var conflictsMap: GoogleMap
+    private lateinit var geocoder: Geocoder
+    private lateinit var progressBar: ProgressBar
+    private var locationPermissionGranted = false
+    private lateinit var locationService: FusedLocationProviderClient
+    private val viewModel: MainViewModel by viewModels()
+
+    // ACLED attribution
+    private val acledLink: String = "https://www.acleddata.com"
+
+    // color
     private val sentimentUtil = SentimentUtil()
     private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
-
-    private lateinit var locationService: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,6 +89,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         conflictMap.getMapAsync(this)
         geocoder = Geocoder(requireContext())
 
+        // hide or show loading spinner
         viewModel.observeShowProgress().observe(viewLifecycleOwner){
             showProgress ->
             run {
@@ -96,19 +101,19 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
+        // close action for the details section
         conflictDetailsBinding.closeButton.setOnClickListener {
             conflictDetailsBinding.conflictDetails.visibility = View.GONE
         }
         conflictDetailsBinding.conflictDetails.visibility = View.GONE
 
-        // launch browser ACLED data
+        // launch browser for ACLED
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(acledLink))
         binding.acledAttribution.setOnClickListener {
             startActivity(browserIntent)
         }
 
         locationService = activity?.let { LocationServices.getFusedLocationProviderClient(it) }!!
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -131,6 +136,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             getConflictLocations()
             val locationResult = locationService.lastLocation
 
+            // zoom out at level 5
             locationResult.addOnSuccessListener { location ->
                 run {
                     if (location != null){
@@ -149,7 +155,6 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             showData(it)
         }
         conflictsMap.setOnMapClickListener {
-
             // hide details layout
             conflictDetailsBinding.conflictDetails.visibility = View.GONE
 
@@ -181,6 +186,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                         val conflictsList = conflictsResponse.conflictList
                         val latLngBounds: LatLngBounds.Builder = LatLngBounds.Builder()
 
+                        // add a marker for each conflict location
                         conflictsList.forEach { conflict ->
                             run {
                                 Log.d(TAG,
@@ -191,11 +197,11 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                                 val markerOption = MarkerOptions().position(conflictLatLng)
                                     .title(conflict.location)
                                 conflictsMap.addMarker(markerOption)
-
                                 latLngBounds.include(conflictLatLng)
                             }
                         }
 
+                        // zoom out so all the markers are visible
                         if (conflictsList.size > 0){
                             conflictsMap.animateCamera(
                                 CameraUpdateFactory.newLatLngBounds(
@@ -203,6 +209,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                                 )
                             )
                         } else {
+                            // if there are no conflict locations from ACLED
                             conflictsMap.clear()
                             Toast.makeText(requireContext(), "Peace!", Toast.LENGTH_SHORT).show()
                         }
@@ -213,6 +220,7 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                 Log.e(javaClass.simpleName, "Unable to find address for location $markerLat, $markerLong")
             }
 
+            // display sentiment score with its matching color
             viewModel.observerConflictSentiment().observe(viewLifecycleOwner){ data ->
                 run {
                     Log.d(TAG, "score => ${data.score} | ${data.type}")
@@ -232,6 +240,9 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * analyze the conflict sentiment using the notes from conflict
+     */
     private fun calculateSentimentColorCode(sentimentScore: Double){
         when (sentimentScore){
             in 0.01..1.0 -> sentimentColor = sentimentUtil.calculatePositiveColor(sentimentScore)
@@ -244,19 +255,19 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         Log.d(TAG, "mood color: [${sentimentColor.red}, ${sentimentColor.green}, ${sentimentColor.blue}]")
     }
 
+    /**
+     * Display details of the event on touch of a marker
+     */
     @SuppressLint("SetTextI18n")
     private fun showData(marker: Marker): Boolean {
         marker.showInfoWindow()
 
         val conflictInfo : Conflicts? = viewModel.getConflictForLocation(marker.title.toString())
-
-
         if (conflictInfo != null){
 
             if (conflictInfo.notes != ""){
                 viewModel.netAnalyzeConflict(conflictInfo.notes)
             }
-
 
             conflictDetailsBinding.conflictDetails.visibility = View.VISIBLE
             conflictDetailsBinding.sources.text = conflictInfo.source
@@ -268,6 +279,9 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         return true
     }
 
+    /**
+     * Conflict information
+     */
     private fun setNotes(notes: String){
         val bracketIndex = notes.indexOf("[")
         var eventNotes = "-empty-"
@@ -278,6 +292,9 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
         conflictDetailsBinding.notes.text = eventNotes
     }
 
+    /**
+     * People involved
+     */
     private fun setActors(actor_one: String, actor_two: String){
         var actorsText = "unknown"
         if (actor_one.isNotEmpty()){

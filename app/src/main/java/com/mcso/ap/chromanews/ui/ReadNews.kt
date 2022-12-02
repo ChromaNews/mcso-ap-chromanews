@@ -28,19 +28,14 @@ class ReadNews : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var activityReadNewsBinding = ActivityReadNewsBinding.inflate(layoutInflater)
-
+        val activityReadNewsBinding = ActivityReadNewsBinding.inflate(layoutInflater)
         setContentView(activityReadNewsBinding.root)
 
         setSupportActionBar(activityReadNewsBinding.toolbar)
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true);
-
-        val bundle: Bundle? = intent.extras
 
         newsWebView = findViewById(R.id.news_webview)
         progressBar = findViewById(R.id.progressBar)
-
         progressBar.max = 50
 
         newsWebView.apply {
@@ -60,6 +55,7 @@ class ReadNews : AppCompatActivity() {
         newsWebView.scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
         progressBar.progress = 0
 
+        val bundle: Bundle? = intent.extras
         if (bundle?.getString("linkKey") != null) {
             newsWebView.loadUrl(bundle?.getString("linkKey")!!)
         }
