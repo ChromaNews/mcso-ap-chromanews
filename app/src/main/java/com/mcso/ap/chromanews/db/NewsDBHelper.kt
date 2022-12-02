@@ -7,7 +7,6 @@ import com.google.firebase.firestore.Query
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 import com.mcso.ap.chromanews.model.sentiment.UserSentimentData
 
-
 class NewsDBHelper {
     private val TAG = "NewsDBHelper"
 
@@ -36,13 +35,10 @@ class NewsDBHelper {
 
     private fun dbFetchSavedNews(email: String,
                                  newsList: MutableLiveData<List<NewsMetaData>>) {
-        var sortColumn = "newsID"
-
-        var sortby = Query.Direction.ASCENDING
-
-        var query = db.collection(rootCollection).document(email).collection(newsCollection)
-            .orderBy(sortColumn, sortby)
-
+        val sortColumn = "newsID"
+        val sortBy = Query.Direction.ASCENDING
+        val query = db.collection(rootCollection).document(email).collection(newsCollection)
+            .orderBy(sortColumn, sortBy)
         limitAndGet(query, newsList)
     }
 
