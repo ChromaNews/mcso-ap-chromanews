@@ -21,14 +21,12 @@ class SportsFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(javaClass.simpleName, "SportsFragment onCreateView")
         _binding = FragmentRvBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(javaClass.simpleName, "SportsFragment onViewCreated")
 
         binding.recyclerRVView.layoutManager = LinearLayoutManager(binding.recyclerRVView.context)
         val adapter = NewsFeedAdapter(viewModel)
