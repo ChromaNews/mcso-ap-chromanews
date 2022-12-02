@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import com.mcso.ap.chromanews.databinding.FragmentMoodColorBinding
 import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.sentiment.SentimentColor
+import com.mcso.ap.chromanews.ui.SentimentUtil
 import java.util.*
 import kotlin.math.abs
 
@@ -26,10 +27,17 @@ class MoodColorFragment : Fragment() {
     private lateinit var sentimentType: String
     private val binding get() = _binding
 
+    private val sentimentUtil = SentimentUtil()
+
+    // color codes
+    private val greenHexCode = "#00FF00"
+    private val whiteHexCode = "#FFFFFF"
+    private val blackHexCode = "#000000"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         _binding = FragmentMoodColorBinding.inflate(inflater, container, false)
         return _binding.root
     }
@@ -43,31 +51,31 @@ class MoodColorFragment : Fragment() {
                 "everytime!"
         binding.explanation.text = explanation
 
-        // default to green
+        // default to green (neutral sentiment)
         Log.d(TAG, "setting default color")
-        var defaultColor = Color.parseColor("#00FF00")
-        binding.colorCode.setTextColor(Color.parseColor("#FFFFFF"))
+        val defaultColor = Color.parseColor(greenHexCode)
+        binding.colorCode.setTextColor(Color.parseColor(whiteHexCode))
         binding.colorCode.setBackgroundColor(defaultColor)
         binding.moodColor.setColorFilter(defaultColor)
 
         viewModel.observeRatingByDate().observe(viewLifecycleOwner){
             calculateSentimentColorCode(it)
-            val sentimentHexColorCode = getSentimentColorInHex()
+            val sentimentHexColorCode = sentimentUtil.getSentimentColorInHex(sentimentColor)
             val hexMoodColor = Color.parseColor(sentimentHexColorCode)
 
             // color code
             binding.colorCode.text = sentimentHexColorCode.uppercase(Locale.getDefault())
             when (sentimentType){
                 "negative" -> {
-                    binding.colorCode.setTextColor(Color.parseColor("#000000"))
+                    binding.colorCode.setTextColor(Color.parseColor(blackHexCode))
                 }
                 else -> {
-                    binding.colorCode.setTextColor(Color.parseColor("#FFFFFF"))
+                    binding.colorCode.setTextColor(Color.parseColor(whiteHexCode))
                 }
             }
             binding.colorCode.setBackgroundColor(hexMoodColor)
 
-            // mind color
+            // mind image color
             binding.moodColor.setColorFilter(hexMoodColor)
         }
     }
@@ -82,17 +90,6 @@ class MoodColorFragment : Fragment() {
         }
     }
 
-    private fun getSentimentColorInHex(): String {
-        val rHex = getHexCode(sentimentColor.red)
-        val gHex = getHexCode(sentimentColor.green)
-        val bHex = getHexCode(sentimentColor.blue)
-        return "#$rHex$gHex$bHex"
-    }
-
-    private fun getHexCode(intColorCode: Int): String {
-        return Integer.toHexString(intColorCode).padStart(2, '0')
-    }
-
     private fun calculateSentimentColorCode(ratingByDate: List<Double>){
         val sentimentValue = (ratingByDate.sum() / ratingByDate.size)
         Log.d(TAG, "total rating: $sentimentValue")
@@ -100,49 +97,32 @@ class MoodColorFragment : Fragment() {
         var helpText = "You are "
         when (sentimentValue){
             in 0.01..1.0 -> {
-                Log.d(TAG, "Positive Sentiment value = $sentimentValue")
-
+                sentimentType = "positive"
                 helpText += if (sentimentValue < 0.5){
                     "on the positive side. keep it going!"
                 } else {
                     "very positive! great job!"
                 }
-                binding.sentimentHelp.text = helpText
-                calculatePositiveColor(sentimentValue)
-                sentimentType = "positive"
+                sentimentColor = sentimentUtil.calculatePositiveColor(sentimentValue)
             }
             in -1.0..-0.01 -> {
-                Log.d(TAG, "Negative Sentiment value = $sentimentValue")
-
+                sentimentType = "negative"
                 helpText += if (sentimentValue > -0.5){
                     "on the negative side. *shrug*"
                 } else {
                     "very negative! alert!"
                 }
-                calculateNegativeColor(sentimentValue)
-                sentimentType = "negative"
+                sentimentColor = sentimentUtil.calculateNegativeColor(sentimentValue)
             }
             else -> {
-                Log.d(TAG, "Neutral Sentiment value = $sentimentValue")
+                sentimentType = "neutral"
                 helpText += " in the sweet spot! Read more"
                 sentimentColor = SentimentColor(0, 255, 0)
-                sentimentType = "neutral"
             }
         }
+        Log.d(TAG, "$sentimentType value = $sentimentValue")
         binding.sentimentHelp.text = helpText
         Log.d(TAG, "mood color: [${sentimentColor.red}, ${sentimentColor.green}, ${sentimentColor.blue}]")
-    }
-
-    private fun calculateNegativeColor(sentimentNum: Double){
-        val red = (abs(sentimentNum) * 255).toInt()
-        val green = abs((1 + sentimentNum) * 255).toInt()
-        sentimentColor = SentimentColor(red, green, 0)
-    }
-
-    private fun calculatePositiveColor(sentimentNum: Double){
-        val blue = (abs(sentimentNum) * 255).toInt()
-        val green = abs((1 - sentimentNum) * 255).toInt()
-        sentimentColor = SentimentColor(0, green, blue)
     }
 
     private fun getWelcomeText(userName: String): String {
