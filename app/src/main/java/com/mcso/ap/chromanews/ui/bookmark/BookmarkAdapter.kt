@@ -60,7 +60,6 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
         binding.title.text = item.title
 
         binding.description.text = item.description
-        // binding.authors.text = item.authors
         binding.link.text = item.link
         binding.PubdateVal.text = item.pubDate
 

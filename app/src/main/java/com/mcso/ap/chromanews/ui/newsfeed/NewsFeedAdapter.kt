@@ -54,8 +54,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
                 val local = viewModel.getItemAt(position)
 
                 if (viewModel.isFav(getItem(position))) {
-                    // viewModel.removeFav(getItem(position))
-                    Log.d("ANUB", "Already bookmarked")
+                    Log.d("NewsFeedAdapter", "Already bookmarked")
                 } else {
                     viewModel.addFav(getItem(position))
 
@@ -129,11 +128,6 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
         } else {
             binding.bookmarkFav.setImageResource(R.drawable.baseline_bookmark_border_24)
         }
-
-        /*binding.title.setOnClickListener {
-            Log.d(TAG, "analyzing news: ${item.title}")
-            viewModel.netAnalyzeNews(item.title)
-        }*/
     }
 
 

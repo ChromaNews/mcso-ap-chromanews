@@ -159,7 +159,7 @@ class MainViewModel(): ViewModel() {
         value = mutableListOf()
     }
 
-    // handling favorites
+    // handling bookmarks
     private var favPostsList = MutableLiveData<List<NewsPost>>().apply{
         value = mutableListOf()
     }
@@ -209,10 +209,8 @@ class MainViewModel(): ViewModel() {
         Log.d("addFav ", favPostsList.value.toString())
     }
 
-    // Convenient place to put it as it is shared
     companion object {
         fun doOnePost(context: Context, newsPost: NewsPost) {
-            // val onePostIntent = Intent(context, OneNewsPost::class.java)
             val onePostIntent = Intent(context, ReadNews::class.java)
 
             onePostIntent.putExtra("titleKey", newsPost.title.toString())
@@ -342,7 +340,6 @@ class MainViewModel(): ViewModel() {
 
         val searchTermValue = searchTerm.value!!
 
-        Log.d("Filter Searchterm", searchTermValue)
         return fetchList.value!!.filter {
             var titleFound = false
             titleFound = setSpan(SpannableString(it.title), searchTermValue)
