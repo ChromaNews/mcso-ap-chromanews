@@ -35,7 +35,7 @@ class SentimentDBHelper {
                                 Log.d(TAG, "Successfully added $email")
                             }
                             .addOnFailureListener {
-                                Log.d(TAG, "Error while creating sentiment : ${it.stackTrace}")
+                                Log.e(TAG, "Error while creating sentiment : ${it.message}")
                             }
                     }
                 }
@@ -84,7 +84,7 @@ class SentimentDBHelper {
                 Log.d(TAG, "successfully added rating to list on ${ratingDate.date}")
             }
             .addOnFailureListener {
-                Log.e(TAG, "Error while adding rate for date: $ratingDate.date: ${it.stackTrace}")
+                Log.e(TAG, "Error while adding rate for date: $ratingDate.date: ${it.message}")
             }
     }
 
@@ -99,7 +99,7 @@ class SentimentDBHelper {
                         Log.d(TAG, "Successfully added ${ratingDate.date}")
                     }
                     .addOnFailureListener {
-                        Log.d(TAG, "Error while adding ${ratingDate.date}")
+                        Log.e(TAG, "Error while adding ${ratingDate.date}: ${it.message}")
                     }
             }
         }

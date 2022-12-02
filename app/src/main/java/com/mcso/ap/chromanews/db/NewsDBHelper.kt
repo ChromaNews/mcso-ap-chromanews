@@ -23,13 +23,13 @@ class NewsDBHelper {
             .limit(100)
             .get()
             .addOnSuccessListener { result ->
-                Log.d(javaClass.simpleName, "allNotes fetch ${result!!.documents.size}")
+                Log.d(TAG, "allNotes fetch ${result!!.documents.size}")
                 newsList.postValue(result.documents.mapNotNull {
                     it.toObject(NewsMetaData::class.java)
                 })
             }
             .addOnFailureListener {
-                Log.d(javaClass.simpleName, "allNotes fetch FAILED ", it)
+                Log.e(TAG, "allNotes fetch FAILED ", it)
             }
     }
 
@@ -57,7 +57,7 @@ class NewsDBHelper {
                                 Log.d(TAG, "Successfully added $email")
                             }
                             .addOnFailureListener {
-                                Log.d(TAG, "Error while create news : ${it.stackTrace}")
+                                Log.e(TAG, "Error while create news : ${it.message}")
                             }
                     }
                 }
