@@ -13,7 +13,7 @@ import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 class BookmarkAdapter(private val viewModel: MainViewModel)
     : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(NewsDiff()) {
     companion object {
-        val TAG = "BookmarkAdapter"
+        const val TAG = "BookmarkAdapter"
     }
 
     private fun getPos(holder: RecyclerView.ViewHolder): Int {

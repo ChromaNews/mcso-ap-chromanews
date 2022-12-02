@@ -21,7 +21,7 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
     : ListAdapter<NewsPost, NewsFeedAdapter.VH>(NewsFeedDiff()) {
 
     companion object {
-        val TAG = "NewsFeedAdapter"
+        const val TAG = "NewsFeedAdapter"
     }
 
     inner class VH(val rowPostBinding : NewsPostBinding)

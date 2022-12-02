@@ -14,6 +14,9 @@ class NewsDBHelper {
     private val rootCollection = "bookmarkNews"
     private val newsCollection = "newsList"
 
+    /**
+     * Fetch news metadata collection
+     */
     fun fetchSavedNews(email: String,
                        newsList: MutableLiveData<List<NewsMetaData>>) {
         dbFetchSavedNews(email, newsList)
@@ -42,7 +45,9 @@ class NewsDBHelper {
         limitAndGet(query, newsList)
     }
 
-
+    /**
+     * Create email if email doesn't exist. If exists, use it for saving metadata
+     */
     private fun createNewsMetadataUser(email: String){
         db.collection(rootCollection).document(email)
             .get()
@@ -64,6 +69,9 @@ class NewsDBHelper {
             }
     }
 
+    /**
+     * Create news metadata collection
+     */
     fun createNewsMetadata(email: String,
                 newsMeta: NewsMetaData,
                 newsList: MutableLiveData<List<NewsMetaData>>
@@ -85,7 +93,9 @@ class NewsDBHelper {
                 }
     }
 
-
+    /**
+     * Remove news metadata collection
+     */
     fun removeNewsMetadata(email: String,
         newsMeta: NewsMetaData,
         newsList: MutableLiveData<List<NewsMetaData>>
