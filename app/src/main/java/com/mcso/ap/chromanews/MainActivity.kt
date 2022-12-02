@@ -1,5 +1,6 @@
 package com.mcso.ap.chromanews
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         actionBarBinding!!.actionSearch.isVisible = false
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -129,12 +131,14 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
+        // disable swipe as it conflicts with drag action in map fragment
+        viewPager2.isUserInputEnabled = false
+
         actionBarBinding?.actionSearch?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(
                 s: CharSequence?, start: Int, count: Int, after: Int
-            ) {
-            }
+            ) { }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.isEmpty()) hideKeyboard()

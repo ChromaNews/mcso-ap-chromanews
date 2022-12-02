@@ -53,6 +53,7 @@ class MainViewModel(): ViewModel() {
     private val repo = ConflictRepo(api)
     private var conflictLiveData = MutableLiveData<ConflictsResponse>()
     private var showProgress = MutableLiveData<Boolean>()
+    private val conflictSentiment = MutableLiveData<SentimentData>()
 
     // for bookmarked news
     private val savednewsDataDB: NewsDBHelper = NewsDBHelper()
@@ -243,7 +244,6 @@ class MainViewModel(): ViewModel() {
             context = viewModelScope.coroutineContext
                     + Dispatchers.IO)
         {
-            val response = sentimentAnalyzerRepo.analyzeNewsText(newsText)
             sentimentResponse.postValue(sentimentAnalyzerRepo.analyzeNewsText(newsText))
         }
     }
@@ -276,6 +276,19 @@ class MainViewModel(): ViewModel() {
             conflictLiveData.postValue(repo.getConflictData(country))
             showProgress.postValue(false)
         }
+    }
+
+    fun netAnalyzeConflict(notes: String){
+        viewModelScope.launch (
+            context = viewModelScope.coroutineContext
+                    + Dispatchers.IO)
+        {
+            conflictSentiment.postValue(sentimentAnalyzerRepo.analyzeNewsText(notes))
+        }
+    }
+
+    fun observerConflictSentiment(): LiveData<SentimentData>{
+        return conflictSentiment
     }
 
     fun observeConflictData(): LiveData<ConflictsResponse> {

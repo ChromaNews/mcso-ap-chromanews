@@ -22,13 +22,4 @@ class ViewPagerAdapter(fragmentActivity: FragmentActivity?) :
     fun setData(fragments: ArrayList<Fragment>?) {
         this.fragments = fragments
     }
-
-    fun getPageTitle(position: Int): Fragment? {
-        // return fragments?.get(position)?.arguments?.getString("title")
-        return fragments?.get(position)
-    }
-
-    fun getItemPosition(`object`: Any?): Int {
-        return PagerAdapter.POSITION_NONE
-    }
 }
