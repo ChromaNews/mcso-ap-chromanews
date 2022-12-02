@@ -20,7 +20,6 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
         val pos = holder.adapterPosition
 
         if (pos == RecyclerView.NO_POSITION) {
-
             return RecyclerView.NO_POSITION
         }
         return pos
@@ -28,7 +27,6 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
 
     inner class VH(val rowBinding: SavedNewsBinding) : RecyclerView.ViewHolder(rowBinding.root) {
         init {
-
             rowBinding.root.setOnClickListener {
                 val position = getPos(this)
                 var item = viewModel.getSavedNewsList().value!![position]
@@ -52,20 +50,15 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val adapterPosition = getPos(holder)
-
         val item = viewModel.getNewsMeta(adapterPosition)
-
         val binding = holder.rowBinding
 
         binding.title.text = item.title
-
         binding.description.text = item.description
         binding.link.text = item.link
         binding.PubdateVal.text = item.pubDate
 
-        if (item.imageURL != null) {
-            Glide.glideFetch(item.imageURL, null, binding.image)
-        }
+        Glide.glideFetch(item.imageURL, null, binding.image)
     }
 
     class RedditDiff : DiffUtil.ItemCallback<NewsMetaData>() {
