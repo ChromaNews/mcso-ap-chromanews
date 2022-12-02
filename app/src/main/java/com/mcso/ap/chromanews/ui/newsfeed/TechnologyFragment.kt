@@ -35,7 +35,9 @@ class TechnologyFragment: Fragment() {
         binding.recyclerRVView.adapter = adapter
 
         viewModel.observeLiveData().observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+            adapter.submitList(it){
+                binding.recyclerRVView.scrollToPosition(0)
+            }
             adapter.notifyDataSetChanged()
         }
 
