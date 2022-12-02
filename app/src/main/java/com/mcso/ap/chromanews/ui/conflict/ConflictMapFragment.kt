@@ -4,6 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
@@ -34,6 +36,8 @@ import com.mcso.ap.chromanews.databinding.ConflictDetailsBinding
 import com.mcso.ap.chromanews.databinding.FragmentConflictMapBinding
 import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.conflict.Conflicts
+import com.mcso.ap.chromanews.model.sentiment.SentimentColor
+import kotlin.math.abs
 
 class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
@@ -51,6 +55,8 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private val conflictDetailsBinding get() = _conflictDetailsBinding
     private lateinit var _conflictDetailsBinding: ConflictDetailsBinding
+
+    private var sentimentColor: SentimentColor = SentimentColor(0,255, 0)
 
     private lateinit var locationService: FusedLocationProviderClient
 
@@ -148,11 +154,21 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
             val markerLocation = it
             val markerLat = markerLocation.latitude
             val markerLong = markerLocation.longitude
-            val addressList = geocoder.getFromLocation(markerLat, markerLong, 1)
-            if (!addressList.isNullOrEmpty()){
+            var addressList = emptyList<Address>()
+
+            try {
+                // handling failures... gracefully (!?)
+                addressList = geocoder.getFromLocation(markerLat, markerLong, 1)
+            } catch (e: Exception){
+                Log.e(TAG, "Exception while identifying selected location: ${e.message}")
+            }
+
+            if (addressList.isNotEmpty()){
                 val countryName = addressList[0].countryName
                 Log.d(TAG, "Country Selected: $countryName")
                 Toast.makeText(requireContext(), "Fetching conflicts in $countryName", Toast.LENGTH_LONG).show()
+
+                // api call to get conflicts
                 viewModel.netConflict(countryName)
 
                 viewModel.observeConflictData().observe(this){ conflictsResponse ->
@@ -194,7 +210,60 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
                 Toast.makeText(requireContext(), "Try a different location", Toast.LENGTH_SHORT).show()
                 Log.e(javaClass.simpleName, "Unable to find address for location $markerLat, $markerLong")
             }
+
+            viewModel.observerConflictSentiment().observe(viewLifecycleOwner){ data ->
+                run {
+                    Log.d(TAG, "score => ${data.score} | ${data.type}")
+                    calculateSentimentColorCode(data.score.toDouble())
+                    val score = String.format(
+                        "%.3f", data.score.toDouble()
+                    ).toDouble()
+                    val sentimentScore = "Sentiment Score: $score"
+                    conflictDetailsBinding.conflictSentiment.text = sentimentScore
+                    conflictDetailsBinding.conflictSentiment.setBackgroundColor(Color.parseColor(getSentimentColorInHex()))
+                }
+            }
         }
+    }
+
+    private fun calculateSentimentColorCode(sentimentScore: Double){
+        when (sentimentScore){
+            in 0.01..1.0 -> {
+                Log.d(TAG, "Positive Sentiment value = $sentimentScore")
+                calculatePositiveColor(sentimentScore)
+            }
+            in -1.0..-0.01 -> {
+                Log.d(TAG, "Negative Sentiment value = $sentimentScore")
+                calculateNegativeColor(sentimentScore)
+            }
+            else -> {
+                Log.d(TAG, "Neutral Sentiment value = $sentimentScore")
+            }
+        }
+        Log.d(TAG, "mood color: [${sentimentColor.red}, ${sentimentColor.green}, ${sentimentColor.blue}]")
+    }
+
+    private fun calculateNegativeColor(sentimentNum: Double){
+        val red = (abs(sentimentNum) * 255).toInt()
+        val green = abs((1 + sentimentNum) * 255).toInt()
+        sentimentColor = SentimentColor(red, green, 0)
+    }
+
+    private fun calculatePositiveColor(sentimentNum: Double){
+        val blue = (abs(sentimentNum) * 255).toInt()
+        val green = abs((1 - sentimentNum) * 255).toInt()
+        sentimentColor = SentimentColor(0, green, blue)
+    }
+
+    private fun getSentimentColorInHex(): String {
+        val rHex = getHexCode(sentimentColor.red)
+        val gHex = getHexCode(sentimentColor.green)
+        val bHex = getHexCode(sentimentColor.blue)
+        return "#$rHex$gHex$bHex"
+    }
+
+    private fun getHexCode(intColorCode: Int): String {
+        return Integer.toHexString(intColorCode).padStart(2, '0')
     }
 
     @SuppressLint("SetTextI18n")
@@ -203,12 +272,18 @@ class ConflictMapFragment : Fragment(), OnMapReadyCallback {
 
         val conflictInfo : Conflicts? = viewModel.getConflictForLocation(marker.title.toString())
 
+
         if (conflictInfo != null){
+
+            if (conflictInfo.notes != ""){
+                viewModel.netAnalyzeConflict(conflictInfo.notes)
+            }
+
+
             conflictDetailsBinding.conflictDetails.visibility = View.VISIBLE
             conflictDetailsBinding.sources.text = conflictInfo.source
             setNotes(conflictInfo.notes)
             setActors(conflictInfo.actor_one, conflictInfo.actor_two)
-
             conflictDetailsBinding.eventDate.text = conflictInfo.date
         }
 
