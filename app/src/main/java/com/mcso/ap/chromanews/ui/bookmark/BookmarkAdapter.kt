@@ -11,24 +11,21 @@ import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 
 class BookmarkAdapter(private val viewModel: MainViewModel)
-    : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(RedditDiff()) {
+    : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(NewsDiff()) {
     companion object {
-        val TAG = "BookmarkAdapter"
+        const val TAG = "BookmarkAdapter"
     }
 
     private fun getPos(holder: RecyclerView.ViewHolder): Int {
         val pos = holder.adapterPosition
-
-        if (pos == RecyclerView.NO_POSITION) {
-
-            return RecyclerView.NO_POSITION
+        if (pos != RecyclerView.NO_POSITION) {
+            return pos
         }
-        return pos
+        return  RecyclerView.NO_POSITION
     }
 
     inner class VH(val rowBinding: SavedNewsBinding) : RecyclerView.ViewHolder(rowBinding.root) {
         init {
-
             rowBinding.root.setOnClickListener {
                 val position = getPos(this)
                 var item = viewModel.getSavedNewsList().value!![position]
@@ -52,24 +49,18 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val adapterPosition = getPos(holder)
-
         val item = viewModel.getNewsMeta(adapterPosition)
-
         val binding = holder.rowBinding
 
         binding.title.text = item.title
-
         binding.description.text = item.description
-        // binding.authors.text = item.authors
         binding.link.text = item.link
         binding.PubdateVal.text = item.pubDate
 
-        if (item.imageURL != null) {
-            Glide.glideFetch(item.imageURL, null, binding.image)
-        }
+        Glide.glideFetch(item.imageURL, null, binding.image)
     }
 
-    class RedditDiff : DiffUtil.ItemCallback<NewsMetaData>() {
+    class NewsDiff : DiffUtil.ItemCallback<NewsMetaData>() {
         override fun areItemsTheSame(oldItem: NewsMetaData, newItem: NewsMetaData): Boolean {
             return oldItem.firestoreID == newItem.firestoreID
         }

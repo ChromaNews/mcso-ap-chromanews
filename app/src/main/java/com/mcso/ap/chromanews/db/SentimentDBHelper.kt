@@ -18,8 +18,9 @@ class SentimentDBHelper {
     private val rootCollection = "userSentiments"
     private val dateCollection = "dateList"
 
-    private val ratingDateList = MutableLiveData<List<Double>>()
-
+    /**
+     * Create user sentiment collection
+     */
     private fun createSentimentUser(email: String){
         db.collection(rootCollection).document(email)
             .get()
@@ -34,15 +35,17 @@ class SentimentDBHelper {
                                 Log.d(TAG, "Successfully added $email")
                             }
                             .addOnFailureListener {
-                                Log.d(TAG, "Error while creating sentiment : ${it.stackTrace}")
+                                Log.e(TAG, "Error while creating sentiment : ${it.message}")
                             }
                     }
                 }
             }
     }
 
+    /**
+     * Fetch existing ratings, if exists and add a new rating entry
+     */
     fun createSentimentRating(email: String, sentimentRating: Double){
-
         createSentimentUser(email)
 
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -72,16 +75,22 @@ class SentimentDBHelper {
         }
     }
 
+    /**
+     * add a new rating document for the current date
+     */
     private fun updateRatingToTodayDoc(todayRatingDocument: DocumentReference, ratingDate: RatingDate){
         todayRatingDocument.set(ratingDate)
             .addOnSuccessListener {
                 Log.d(TAG, "successfully added rating to list on ${ratingDate.date}")
             }
             .addOnFailureListener {
-                Log.e(TAG, "Error while adding rate for date: $ratingDate.date: ${it.stackTrace}")
+                Log.e(TAG, "Error while adding rate for date: $ratingDate.date: ${it.message}")
             }
     }
 
+    /**
+     * creates a date document in the date collection
+     */
     private fun createDateCollection(dateCollectionRef: CollectionReference, dateList: List<RatingDate>){
         dateList.forEach { ratingDate ->
             run {
@@ -90,12 +99,15 @@ class SentimentDBHelper {
                         Log.d(TAG, "Successfully added ${ratingDate.date}")
                     }
                     .addOnFailureListener {
-                        Log.d(TAG, "Error while adding ${ratingDate.date}")
+                        Log.e(TAG, "Error while adding ${ratingDate.date}: ${it.message}")
                     }
             }
         }
     }
 
+    /**
+     * returns a list of rating by date
+     */
     fun getTotalRating(email: String, ratingDateList: MutableLiveData<List<Double>>) {
         val ratingByDate = mutableListOf<Double>()
         val dateCollection = db.collection(rootCollection)
@@ -122,6 +134,7 @@ class SentimentDBHelper {
                     }
                 }
 
+                // default to neutral if there is no rating data available for the user
                 if (ratingByDate.size > 0){
                     Log.d(TAG, "total rate: ${ratingByDate[0]}")
                     ratingDateList.postValue(ratingByDate)

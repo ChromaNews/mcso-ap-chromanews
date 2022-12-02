@@ -10,8 +10,8 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ConflictsApi {
-    @GET("acled/read/?key=2TbbxrgT-!H6K*e!ndOV&email=thiyagarajan.angappan@utexas.edu&limit=10&year=2022")
-    suspend fun getConflictData(@Query("country") country: String): ConflictsResponse
+    @GET("acled/read/?key=2TbbxrgT-!H6K*e!ndOV&email=thiyagarajan.angappan@utexas.edu&limit=10")
+    suspend fun getConflictData(@Query("country") country: String, @Query("year") year: Int): ConflictsResponse
 
     companion object {
         var url = HttpUrl.Builder()

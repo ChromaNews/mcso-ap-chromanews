@@ -7,7 +7,6 @@ import com.google.firebase.firestore.Query
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 import com.mcso.ap.chromanews.model.sentiment.UserSentimentData
 
-
 class NewsDBHelper {
     private val TAG = "NewsDBHelper"
 
@@ -15,6 +14,9 @@ class NewsDBHelper {
     private val rootCollection = "bookmarkNews"
     private val newsCollection = "newsList"
 
+    /**
+     * Fetch news metadata collection
+     */
     fun fetchSavedNews(email: String,
                        newsList: MutableLiveData<List<NewsMetaData>>) {
         dbFetchSavedNews(email, newsList)
@@ -24,29 +26,28 @@ class NewsDBHelper {
             .limit(100)
             .get()
             .addOnSuccessListener { result ->
-                Log.d(javaClass.simpleName, "allNotes fetch ${result!!.documents.size}")
+                Log.d(TAG, "allNotes fetch ${result!!.documents.size}")
                 newsList.postValue(result.documents.mapNotNull {
                     it.toObject(NewsMetaData::class.java)
                 })
             }
             .addOnFailureListener {
-                Log.d(javaClass.simpleName, "allNotes fetch FAILED ", it)
+                Log.e(TAG, "allNotes fetch FAILED ", it)
             }
     }
 
     private fun dbFetchSavedNews(email: String,
                                  newsList: MutableLiveData<List<NewsMetaData>>) {
-        var sortColumn = "newsID"
-
-        var sortby = Query.Direction.ASCENDING
-
-        var query = db.collection(rootCollection).document(email).collection(newsCollection)
-            .orderBy(sortColumn, sortby)
-
+        val sortColumn = "newsID"
+        val sortBy = Query.Direction.ASCENDING
+        val query = db.collection(rootCollection).document(email).collection(newsCollection)
+            .orderBy(sortColumn, sortBy)
         limitAndGet(query, newsList)
     }
 
-
+    /**
+     * Create email if email doesn't exist. If exists, use it for saving metadata
+     */
     private fun createNewsMetadataUser(email: String){
         db.collection(rootCollection).document(email)
             .get()
@@ -61,13 +62,16 @@ class NewsDBHelper {
                                 Log.d(TAG, "Successfully added $email")
                             }
                             .addOnFailureListener {
-                                Log.d(TAG, "Error while create news : ${it.stackTrace}")
+                                Log.e(TAG, "Error while create news : ${it.message}")
                             }
                     }
                 }
             }
     }
 
+    /**
+     * Create news metadata collection
+     */
     fun createNewsMetadata(email: String,
                 newsMeta: NewsMetaData,
                 newsList: MutableLiveData<List<NewsMetaData>>
@@ -89,7 +93,9 @@ class NewsDBHelper {
                 }
     }
 
-
+    /**
+     * Remove news metadata collection
+     */
     fun removeNewsMetadata(email: String,
         newsMeta: NewsMetaData,
         newsList: MutableLiveData<List<NewsMetaData>>

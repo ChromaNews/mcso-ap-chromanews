@@ -18,10 +18,10 @@ import com.mcso.ap.chromanews.databinding.NewsPostBinding
 import java.util.*
 
 class NewsFeedAdapter(private val viewModel: MainViewModel)
-    : ListAdapter<NewsPost, NewsFeedAdapter.VH>(RedditDiff()) {
+    : ListAdapter<NewsPost, NewsFeedAdapter.VH>(NewsFeedDiff()) {
 
     companion object {
-        val TAG = "NewsFeedAdapter"
+        const val TAG = "NewsFeedAdapter"
     }
 
     inner class VH(val rowPostBinding : NewsPostBinding)
@@ -30,14 +30,10 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
 
             rowPostBinding.root.setOnClickListener {
                 var item = getItem(adapterPosition)
-
-                MainViewModel.doOnePost(rowPostBinding.root.context, item)
+                MainViewModel.readNewsPost(rowPostBinding.root.context, item)
             }
 
             rowPostBinding.share.setOnClickListener {
-                val local = viewModel.getItemAt(adapterPosition)
-
-                val sharebody: String = local!!.title
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_TEXT, getItem(adapterPosition).link)
@@ -50,12 +46,9 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
 
             rowPostBinding.bookmarkFav.setOnClickListener {
                 val position = adapterPosition
-                // Toggle Bookmark
-                val local = viewModel.getItemAt(position)
 
                 if (viewModel.isFav(getItem(position))) {
-                    // viewModel.removeFav(getItem(position))
-                    Log.d("ANUB", "Already bookmarked")
+                    Log.d("NewsFeedAdapter", "Already bookmarked")
                 } else {
                     viewModel.addFav(getItem(position))
 
@@ -84,7 +77,6 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-
         val rowBinding = NewsPostBinding.inflate(LayoutInflater.from(parent.context),
             parent, false)
 
@@ -117,27 +109,20 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             binding.link.text = item.link
         }
 
-        var delimeter_1 = "T"
-        var delimeter_2 = "Z"
+        val delimeterT = "T"
+        val delimeterZ = "Z"
+        val modifiedDateTime = item.pubDate.split(delimeterT, delimeterZ)
 
-        var modified_datetime = item.pubDate.split(delimeter_1, delimeter_2)
-
-        binding.PubdateVal.text = modified_datetime.joinToString(" ")
+        binding.PubdateVal.text = modifiedDateTime.joinToString(" ")
 
         if (viewModel.isFav(item)) {
             binding.bookmarkFav.setImageResource(R.drawable.baseline_bookmark_24)
         } else {
             binding.bookmarkFav.setImageResource(R.drawable.baseline_bookmark_border_24)
         }
-
-        /*binding.title.setOnClickListener {
-            Log.d(TAG, "analyzing news: ${item.title}")
-            viewModel.netAnalyzeNews(item.title)
-        }*/
     }
 
-
-    class RedditDiff : DiffUtil.ItemCallback<NewsPost>() {
+    class NewsFeedDiff : DiffUtil.ItemCallback<NewsPost>() {
         override fun areItemsTheSame(oldItem: NewsPost, newItem: NewsPost): Boolean {
             return oldItem.title == newItem.title
         }
@@ -145,7 +130,6 @@ class NewsFeedAdapter(private val viewModel: MainViewModel)
             return oldItem.title == newItem.title
         }
     }
-
 }
 
 

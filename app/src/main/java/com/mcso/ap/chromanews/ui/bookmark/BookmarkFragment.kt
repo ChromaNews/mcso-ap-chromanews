@@ -1,15 +1,12 @@
 package com.mcso.ap.chromanews.ui.bookmark
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mcso.ap.chromanews.databinding.FragmentRvBinding
 import com.mcso.ap.chromanews.model.MainViewModel
-import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
-import java.util.*
 
 class BookmarkFragment : Fragment() {
     private var _binding: FragmentRvBinding? = null
@@ -17,7 +14,6 @@ class BookmarkFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private var bookmarkadapter: BookmarkAdapter? = null
-    private val tempList: ArrayList<NewsMetaData> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,9 +21,7 @@ class BookmarkFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRvBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-        Log.d("BookmarksFragment", "onCreateView $viewModel")
-        return root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
