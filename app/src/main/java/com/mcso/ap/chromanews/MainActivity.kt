@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         actionBar.setDisplayShowCustomEnabled(true)
 
         actionBarBinding = ActionBarBinding.inflate(layoutInflater)
+
         // Apply the custom view
         actionBar.customView = actionBarBinding?.root
         actionBarBinding!!.actionSearch.isVisible = false
@@ -79,12 +80,13 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         // Firebase Auth
         AuthInit(viewModel,signInLauncher)
 
+        // Logout
         val logoutButton: FloatingActionButton = binding.logout
-
         logoutButton.setOnClickListener {
             showDialog()
         }
 
+        // Tab Layout construction
         viewPager2 = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
         val viewPager2Adapter = ViewPagerAdapter(this)
@@ -96,6 +98,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
                 fragmentList.add(tabs.getFragment())
             }
         }
+
         viewPager2Adapter.setData(fragmentList) //sets the data for the adapter
 
         viewPager2.adapter = viewPager2Adapter
@@ -104,28 +107,15 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 Log.d(TAG, "selected ${tab.text} at position ${tab.position}")
-                var selectedTab = tab.text.toString()
+                val selectedTab = tab.text.toString()
 
                 actionBarBinding!!.actionSearch.setText("")
 
                 viewModel.setCategory(selectedTab)
                 actionBarBinding!!.actionSearch.isVisible = true
 
-                if (Tabs.SENTIMENT.getTitle() == selectedTab
-                    || Tabs.CONFLICTS.getTitle() == selectedTab){
-                    actionBarBinding!!.actionSearch.isVisible = false
-                }
-
-                if (Tabs.SENTIMENT.getTitle() != selectedTab
-                    && Tabs.CONFLICTS.getTitle() != selectedTab){
-
-                    if (Tabs.BOOKMARK.getTitle() == selectedTab){
-                        viewModel.fetchSavedNewsList()
-                        actionBarBinding!!.actionSearch.isVisible = false
-                    } else {
-                        viewModel.getFeedForCategory()
-                    }
-                }
+                hideSearch(selectedTab)
+                fetchNewsOrBookmarks(selectedTab)
             }
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
@@ -134,6 +124,7 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         // disable swipe as it conflicts with drag action in map fragment
         viewPager2.isUserInputEnabled = false
 
+        // Search newsfeed
         actionBarBinding?.actionSearch?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(
@@ -147,6 +138,8 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         })
 
         // trigger sentiment rate calculation once user logs on
+        // But this in turn does not trigger the observer or sentiment live data after load
+        // (known issue)
         viewModel.observeUserName().observe(this){
             if (viewModel.getCurrentUser() != null){
                 viewModel.calculateRating()
@@ -154,6 +147,36 @@ class MainActivity : AppCompatActivity(), TabLayoutMediator.TabConfigurationStra
         }
     }
 
+    /**
+     * Do not display search for sentiments and conflicts tab
+     */
+    private fun hideSearch(selectedTab: String){
+        if (Tabs.SENTIMENT.getTitle() == selectedTab
+            || Tabs.CONFLICTS.getTitle() == selectedTab
+            || Tabs.BOOKMARK.getTitle() == selectedTab){
+            actionBarBinding!!.actionSearch.isVisible = false
+        }
+    }
+
+    /**
+     * If selected tab is one of the newsfeed tabs trigger news API
+     * If it is bookmarks tab, make a Firestore DB call
+     */
+    private fun fetchNewsOrBookmarks(selectedTab: String){
+        if (Tabs.SENTIMENT.getTitle() != selectedTab
+            && Tabs.CONFLICTS.getTitle() != selectedTab){
+
+            if (Tabs.BOOKMARK.getTitle() == selectedTab){
+                viewModel.fetchSavedNewsList()
+            } else {
+                viewModel.getFeedForCategory()
+            }
+        }
+    }
+
+    /**
+     * Display logout confirmation dialog
+     */
     private fun showDialog(){
         val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this)
         alertDialog.setTitle("Logout")

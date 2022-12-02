@@ -18,8 +18,6 @@ class SentimentDBHelper {
     private val rootCollection = "userSentiments"
     private val dateCollection = "dateList"
 
-    private val ratingDateList = MutableLiveData<List<Double>>()
-
     private fun createSentimentUser(email: String){
         db.collection(rootCollection).document(email)
             .get()

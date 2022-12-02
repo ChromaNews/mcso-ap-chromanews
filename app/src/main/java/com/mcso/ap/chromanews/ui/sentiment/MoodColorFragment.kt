@@ -114,7 +114,7 @@ class MoodColorFragment : Fragment() {
             in -1.0..-0.01 -> {
                 Log.d(TAG, "Negative Sentiment value = $sentimentValue")
 
-                helpText += if (sentimentValue < 0.5){
+                helpText += if (sentimentValue > -0.5){
                     "on the negative side. *shrug*"
                 } else {
                     "very negative! alert!"
