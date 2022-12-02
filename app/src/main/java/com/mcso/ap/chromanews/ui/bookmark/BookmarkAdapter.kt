@@ -11,7 +11,7 @@ import com.mcso.ap.chromanews.model.MainViewModel
 import com.mcso.ap.chromanews.model.savedNews.NewsMetaData
 
 class BookmarkAdapter(private val viewModel: MainViewModel)
-    : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(RedditDiff()) {
+    : ListAdapter<NewsMetaData, BookmarkAdapter.VH>(NewsDiff()) {
     companion object {
         val TAG = "BookmarkAdapter"
     }
@@ -19,11 +19,11 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
     private fun getPos(holder: RecyclerView.ViewHolder): Int {
         val pos = holder.adapterPosition
 
-        if (pos == RecyclerView.NO_POSITION) {
+        if (pos != RecyclerView.NO_POSITION) {
 
-            return RecyclerView.NO_POSITION
+            return pos
         }
-        return pos
+        return  RecyclerView.NO_POSITION
     }
 
     inner class VH(val rowBinding: SavedNewsBinding) : RecyclerView.ViewHolder(rowBinding.root) {
@@ -68,7 +68,7 @@ class BookmarkAdapter(private val viewModel: MainViewModel)
         }
     }
 
-    class RedditDiff : DiffUtil.ItemCallback<NewsMetaData>() {
+    class NewsDiff : DiffUtil.ItemCallback<NewsMetaData>() {
         override fun areItemsTheSame(oldItem: NewsMetaData, newItem: NewsMetaData): Boolean {
             return oldItem.firestoreID == newItem.firestoreID
         }

@@ -17,7 +17,6 @@ class BookmarkFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private var bookmarkadapter: BookmarkAdapter? = null
-    private val tempList: ArrayList<NewsMetaData> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
