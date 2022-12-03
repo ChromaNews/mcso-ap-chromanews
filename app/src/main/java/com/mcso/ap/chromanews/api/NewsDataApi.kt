@@ -12,7 +12,7 @@ interface NewsDataApi {
     // A newsapi.org has hard limit on API request per day. If API limit is exceeded,
     // use alternative API key provided below:
     // fcedd3d6f6044ab3ba242bb98e9babbf  | cf98e9a0b37945e690f495886bc4b545
-    @GET("v2/top-headlines?language=en&apiKey=cf98e9a0b37945e690f495886bc4b545&pageSize=100")
+    @GET("v2/top-headlines?language=en&apiKey=fcedd3d6f6044ab3ba242bb98e9babbf&pageSize=100")
     suspend fun getNews(@Query("category") category: String) : NewsDataResponse
 
     data class NewsDataResponse(
